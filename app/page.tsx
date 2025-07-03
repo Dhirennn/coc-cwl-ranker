@@ -10,7 +10,7 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b border-yellow-600/30 bg-slate-900/90 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3">
             <div className="relative">
               <Shield className="h-10 w-10 text-yellow-400 drop-shadow-lg" />
               <Crown className="h-5 w-5 text-yellow-300 absolute -top-1 -right-1" />
@@ -19,7 +19,7 @@ export default function HomePage() {
               <h1 className="text-2xl font-bold text-yellow-400 drop-shadow-lg">CWL War Council</h1>
               <p className="text-xs text-blue-300">Fair Bonus Distribution</p>
             </div>
-          </div>
+          </Link>
           <nav className="hidden md:flex items-center gap-6">
             <Link href="#battle-strategy" className="text-blue-200 hover:text-yellow-400 transition-colors font-medium">
               Battle Strategy
