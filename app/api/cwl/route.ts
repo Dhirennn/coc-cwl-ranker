@@ -10,12 +10,89 @@ const COC_API_BASE = 'https://api.clashofclans.com/v1'
 const FIXIE_URL = process.env.FIXIE_URL
 const USE_FIXIE = !!FIXIE_URL
 
-// Configure global proxy if Fixie is available
-if (USE_FIXIE && FIXIE_URL && typeof process !== 'undefined') {
-  console.log(`🔗 Configuring global proxy with Fixie: ${FIXIE_URL.substring(0, 30)}...`)
-  process.env.HTTP_PROXY = FIXIE_URL
-  process.env.HTTPS_PROXY = FIXIE_URL
-  console.log(`✅ Global proxy configured`)
+// Create a custom fetch function that uses proxy when available
+async function customFetch(url: string, options: RequestInit = {}): Promise<Response> {
+  if (USE_FIXIE && FIXIE_URL) {
+    console.log(`🔗 Using Fixie proxy for request to: ${url}`)
+    
+    try {
+      // Use native Node.js modules to make the request through proxy
+      const https = require('https')
+      const http = require('http')
+      const { URL } = require('url')
+      
+      const proxyUrl = new URL(FIXIE_URL)
+      const targetUrl = new URL(url)
+      
+      return new Promise((resolve, reject) => {
+        // Create CONNECT tunnel for HTTPS requests
+        const proxyReq = http.request({
+          host: proxyUrl.hostname,
+          port: proxyUrl.port || 80,
+          method: 'CONNECT',
+          path: `${targetUrl.hostname}:${targetUrl.port || 443}`,
+          headers: {
+            'Proxy-Authorization': 'Basic ' + Buffer.from(`${proxyUrl.username}:${proxyUrl.password}`).toString('base64'),
+            'Host': `${targetUrl.hostname}:${targetUrl.port || 443}`
+          }
+        })
+        
+        proxyReq.on('connect', (res: any, socket: any) => {
+          // Now make the actual HTTPS request through the tunnel
+          const req = https.request({
+            socket: socket,
+            host: targetUrl.hostname,
+            port: targetUrl.port || 443,
+            method: options.method || 'GET',
+            path: targetUrl.pathname + (targetUrl.search || ''),
+            headers: options.headers as Record<string, string>
+          }, (response: any) => {
+            let data = ''
+            response.on('data', (chunk: any) => {
+              data += chunk
+            })
+            response.on('end', () => {
+              // Create a Response-like object
+              const responseObj = {
+                ok: response.statusCode >= 200 && response.statusCode < 300,
+                status: response.statusCode,
+                statusText: response.statusMessage,
+                headers: new Headers(response.headers),
+                json: async () => JSON.parse(data),
+                text: async () => data
+              } as Response
+              
+              resolve(responseObj)
+            })
+          })
+          
+          req.on('error', reject)
+          
+          // Send request body if present
+          if (options.body) {
+            req.write(options.body)
+          }
+          req.end()
+        })
+        
+        proxyReq.on('error', (error: any) => {
+          console.log(`⚠️ Proxy tunnel failed: ${error}`)
+          reject(error)
+        })
+        
+        proxyReq.end()
+      })
+      
+    } catch (error) {
+      console.log(`⚠️ Custom proxy request failed: ${error}`)
+      console.log(`⚠️ Falling back to direct request`)
+      // Fallback to direct request
+      return fetch(url, options)
+    }
+  } else {
+    // Direct request without proxy
+    return fetch(url, options)
+  }
 }
 
 interface CWLMember {
@@ -52,8 +129,8 @@ async function fetchWithAuth(url: string, apiKey: string) {
     }
   }
 
-  // Make the request - proxy should be automatically used if configured
-  const response = await fetch(url, fetchOptions)
+  // Use our custom fetch that supports proxy
+  const response = await customFetch(url, fetchOptions)
   
   console.log(`📡 Response status: ${response.status} ${response.statusText}`)
   
@@ -178,7 +255,7 @@ export async function POST(request: NextRequest) {
         console.log(`🔗 HTTPS_PROXY: ${process.env.HTTPS_PROXY ? 'SET' : 'NOT SET'}`)
         
         // Test 1: Check our outbound IP
-        const ipResponse = await fetch('https://httpbin.org/ip', {
+        const ipResponse = await customFetch('https://httpbin.org/ip', {
           method: 'GET'
         })
         
@@ -193,7 +270,7 @@ export async function POST(request: NextRequest) {
         console.log(`🧪 Testing CoC API accessibility...`)
         let apiTest = 'Not tested'
         try {
-          const testResponse = await fetch('https://api.clashofclans.com/v1/leagues', {
+          const testResponse = await customFetch('https://api.clashofclans.com/v1/leagues', {
             headers: {
               'Accept': 'application/json'
             }
