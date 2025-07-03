@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Shield, Trophy, Star, Crown, Swords, Calculator, Users, AlertCircle, Loader2 } from "lucide-react"
+import { Shield, Trophy, Star, Crown, Swords, Calculator, Users, AlertCircle, Loader2, Key, Eye, EyeOff, ExternalLink, Info } from "lucide-react"
 import Link from "next/link"
 
 interface CWLMember {
@@ -29,6 +29,8 @@ interface Attack {
 
 export default function RankerPage() {
   const [clanTag, setClanTag] = useState("")
+  const [apiKey, setApiKey] = useState("")
+  const [showApiKey, setShowApiKey] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [members, setMembers] = useState<CWLMember[]>([])
@@ -79,6 +81,12 @@ export default function RankerPage() {
       return
     }
 
+    // Allow TEST mode without API key
+    if (clanTag.trim().toUpperCase() !== 'TEST' && !apiKey.trim()) {
+      setError("Please enter your API key (or use 'TEST' as clan tag to try demo data)")
+      return
+    }
+
     setLoading(true)
     setError("")
     
@@ -88,7 +96,10 @@ export default function RankerPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ clanTag: clanTag.trim() }),
+        body: JSON.stringify({ 
+          clanTag: clanTag.trim(),
+          apiKey: apiKey.trim()
+        }),
       })
 
       const data = await response.json()
@@ -101,7 +112,7 @@ export default function RankerPage() {
       setLeagueInfo(data.leagueInfo)
       
     } catch (err: any) {
-      setError(err.message || "Failed to fetch clan data. Please check the clan tag and try again.")
+      setError(err.message || "Failed to fetch clan data. Please check the clan tag and API key.")
     } finally {
       setLoading(false)
     }
@@ -154,21 +165,117 @@ export default function RankerPage() {
               Enter the War Room
                 </CardTitle>
                 <CardDescription className="text-blue-200">
-              Enter your clan tag to calculate fair CWL bonus rankings based on mathematical performance analysis
+              Enter your clan tag and API key to calculate fair CWL bonus rankings
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-4">
+              <CardContent className="space-y-6">
+            {/* API Key Instructions */}
+            <Card className="bg-blue-900/30 border-blue-500/30">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-blue-300 text-lg">
+                  <Info className="h-5 w-5" />
+                  Get Your API Key (Required)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="text-sm text-blue-200 space-y-2">
+                  <div className="font-semibold text-blue-100">Follow these steps to get your Clash of Clans API key:</div>
+                  <ol className="list-decimal list-inside space-y-1 ml-4">
+                    <li>
+                      Go to{" "}
+                      <a 
+                        href="https://developer.clashofclans.com/#/account" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-yellow-300 hover:text-yellow-200 underline inline-flex items-center gap-1"
+                      >
+                        developer.clashofclans.com
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </li>
+                    <li>Click on "Create New Key"</li>
+                    <li>Add any Key Name and Description</li>
+                    <li>
+                      Go to{" "}
+                      <a 
+                        href="https://whatismyipaddress.com/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-yellow-300 hover:text-yellow-200 underline inline-flex items-center gap-1"
+                      >
+                        whatismyipaddress.com
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                      {" "}and copy your IPv4
+                    </li>
+                    <li>Paste the IPv4 into the "Allowed IP Addresses" field when creating the key</li>
+                    <li>Copy-paste your API key below</li>
+                  </ol>
+                  <div className="bg-green-900/30 border border-green-500/30 rounded-lg p-3 mt-3">
+                    <div className="flex items-center gap-2 text-green-300 text-sm">
+                      <Shield className="h-4 w-4" />
+                      <span className="font-semibold">Privacy Notice:</span>
+                    </div>
+                    <p className="text-green-200 text-xs mt-1">
+                      We do not store your API key. It is only used for this session and transmitted securely over HTTPS.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+                <div className="space-y-4">
+              {/* API Key Input */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-yellow-300 flex items-center gap-2">
+                  <Key className="h-4 w-4" />
+                  Your API Key (Private & Secure)
+                </label>
+                <div className="relative">
+                  <Input
+                    type={showApiKey ? "text" : "password"}
+                    placeholder="Paste your Clash of Clans API key here..."
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    className="flex-1 bg-slate-900/50 border-blue-500/30 text-white placeholder:text-slate-400 pr-12"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-1 top-1 h-8 w-8 p-0 hover:bg-slate-700"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                  >
+                    {showApiKey ? (
+                      <EyeOff className="h-4 w-4 text-slate-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-slate-400" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Clan Tag Input */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-yellow-300">
+                  Clan Tag
+                </label>
                     <Input
                 placeholder="Enter clan tag (e.g., #2ABC123)"
                       value={clanTag}
                       onChange={(e) => setClanTag(e.target.value)}
                 className="flex-1 bg-slate-900/50 border-blue-500/30 text-white placeholder:text-slate-400"
                     />
+                <div className="text-xs text-slate-400">
+                  <span className="text-yellow-300">💡 Want to try first?</span> Enter "TEST" as clan tag to see demo data (no API key needed)
+                </div>
+              </div>
+
+              {/* Submit Button */}
                 <Button
                 onClick={handleAnalyzeClan}
                 disabled={loading}
-                className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-slate-900 font-bold px-8"
+                className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-slate-900 font-bold py-3"
                 >
                 {loading ? (
                   <>

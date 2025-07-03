@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// You'll need to get your API token from https://developer.clashofclans.com/
-const COC_API_TOKEN = process.env.COC_API_TOKEN || 'YOUR_API_TOKEN_HERE'
+// COC API base URL
 const COC_API_BASE = 'https://api.clashofclans.com/v1'
 
 interface CWLMember {
@@ -22,15 +21,21 @@ interface Attack {
   attackerTH: number
 }
 
-async function fetchWithAuth(url: string) {
+async function fetchWithAuth(url: string, apiKey: string) {
   const response = await fetch(url, {
     headers: {
-      'Authorization': `Bearer ${COC_API_TOKEN}`,
+      'Authorization': `Bearer ${apiKey}`,
       'Accept': 'application/json'
     }
   })
   
   if (!response.ok) {
+    if (response.status === 403) {
+      throw new Error('Invalid API key or IP address not allowed. Please check your API key and IP address settings.')
+    }
+    if (response.status === 404) {
+      throw new Error('Clan not found. Please check the clan tag.')
+    }
     throw new Error(`CoC API error: ${response.status} ${response.statusText}`)
   }
   
@@ -113,7 +118,7 @@ function normalizeClanTag(tag: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const { clanTag } = await request.json()
+    const { clanTag, apiKey } = await request.json()
     
     if (!clanTag) {
       return NextResponse.json({ error: 'Clan tag is required' }, { status: 400 })
@@ -212,12 +217,26 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    // For real API calls, require API key
+    if (!apiKey) {
+      return NextResponse.json({ 
+        error: 'API key is required. Please follow the instructions above to get your Clash of Clans API key.' 
+      }, { status: 400 })
+    }
+
+    // Validate API key format (basic check)
+    // if (!apiKey.startsWith('eyJ') || apiKey.length < 100) {
+    //   return NextResponse.json({ 
+    //     error: 'Invalid API key format. Please make sure you copied the complete API key from the Clash of Clans developer portal.' 
+    //   }, { status: 400 })
+    // }
+
     // URL encode the clan tag (replace # with %23)
     const encodedClanTag = encodeURIComponent(clanTag)
     
     // Step 1: Get current CWL league group
     const leagueGroupUrl = `${COC_API_BASE}/clans/${encodedClanTag}/currentwar/leaguegroup`
-    const leagueGroup = await fetchWithAuth(leagueGroupUrl)
+    const leagueGroup = await fetchWithAuth(leagueGroupUrl, apiKey)
     
     if (!leagueGroup || leagueGroup.state === 'notInWar') {
       return NextResponse.json({ error: 'Clan is not currently in CWL' }, { status: 404 })
@@ -228,7 +247,7 @@ export async function POST(request: NextRequest) {
       round.warTags.map((warTag: string) => {
         if (warTag === '#0') return null // Skip placeholder wars
         const encodedWarTag = encodeURIComponent(warTag)
-        return fetchWithAuth(`${COC_API_BASE}/clanwarleagues/wars/${encodedWarTag}`)
+        return fetchWithAuth(`${COC_API_BASE}/clanwarleagues/wars/${encodedWarTag}`, apiKey)
       })
     ).filter(Boolean)
 
@@ -236,7 +255,7 @@ export async function POST(request: NextRequest) {
     
     // Step 3: Get clan member data
     const clanUrl = `${COC_API_BASE}/clans/${encodedClanTag}`
-    const clanData = await fetchWithAuth(clanUrl)
+    const clanData = await fetchWithAuth(clanUrl, apiKey)
     
     // Step 4: Process war data and calculate scores
     const memberMap = new Map<string, CWLMember>()
