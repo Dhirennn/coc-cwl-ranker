@@ -33,6 +33,7 @@ export default function RankerPage() {
   const [showApiKey, setShowApiKey] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [testResult, setTestResult] = useState("")
   const [members, setMembers] = useState<CWLMember[]>([])
   const [leagueInfo, setLeagueInfo] = useState<any>(null)
 
@@ -89,6 +90,7 @@ export default function RankerPage() {
 
     setLoading(true)
     setError("")
+    setTestResult("")
     
     try {
       const response = await fetch('/api/cwl', {
@@ -106,6 +108,20 @@ export default function RankerPage() {
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to fetch clan data')
+      }
+
+      // Handle special test responses
+      if (clanTag.trim().toUpperCase() === 'IP-TEST') {
+        const status = data.isUsingFixieIP ? '✅ SUCCESS' : '❌ ISSUE'
+        const statusColor = data.isUsingFixieIP ? 'text-green-400' : 'text-orange-400'
+        
+        setTestResult(`🌐 IP Address & Proxy Check:\n• Status: ${status}\n• Your outbound IP: ${data.outboundIP}\n• Expected Fixie IPs: ${data.expectedIPs}\n• Fixie configured: ${data.fixieEnabled ? 'Yes' : 'No'}\n• HTTP proxy set: ${data.httpProxy}\n• CoC API test: ${data.cocApiTest}\n\n📋 ${data.instructions}`)
+        return
+      }
+
+      if (clanTag.trim().toUpperCase() === 'FIXIE-TEST') {
+        setTestResult(`🔧 Fixie Configuration:\n• Status: ${data.message}\n• Configured: ${data.fixieConfigured ? 'Yes' : 'No'}\n\n📋 ${data.instructions}`)
+        return
       }
 
       setMembers(data.members || [])
@@ -327,6 +343,13 @@ export default function RankerPage() {
               <div className="flex items-center gap-2 text-red-400 bg-red-900/20 p-3 rounded-lg border border-red-500/30">
                 <AlertCircle className="h-4 w-4" />
                 {error}
+              </div>
+            )}
+
+            {testResult && (
+              <div className="flex items-start gap-2 text-blue-400 bg-blue-900/20 p-3 rounded-lg border border-blue-500/30">
+                <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <pre className="text-sm whitespace-pre-wrap">{testResult}</pre>
               </div>
             )}
               </CardContent>
