@@ -33,6 +33,7 @@ export default function RankerPage() {
   const [showApiKey, setShowApiKey] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [testResult, setTestResult] = useState("")
   const [members, setMembers] = useState<CWLMember[]>([])
   const [leagueInfo, setLeagueInfo] = useState<any>(null)
 
@@ -89,6 +90,7 @@ export default function RankerPage() {
 
     setLoading(true)
     setError("")
+    setTestResult("")
     
     try {
       const response = await fetch('/api/cwl', {
@@ -106,6 +108,14 @@ export default function RankerPage() {
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to fetch clan data')
+      }
+
+      // Handle IP-TEST response
+      if (clanTag.trim().toUpperCase() === 'IP-TEST') {
+        const status = data.isUsingExpectedIP ? '✅ SUCCESS' : '⚠️ INFO'
+        
+        setTestResult(`🌐 IP Address Check for Render Static IPs:\n• Status: ${status}\n• Your outbound IP: ${data.outboundIP}\n• Expected Render IPs: ${data.expectedIPs}\n• Platform: ${data.platform}\n• CoC API test: ${data.cocApiTest}\n\n📋 ${data.instructions}`)
+        return
       }
 
       // Handle special test responses
@@ -300,8 +310,9 @@ export default function RankerPage() {
                   onChange={(e) => setClanTag(e.target.value)}
                   className="flex-1 bg-slate-900/50 border-blue-500/30 text-white placeholder:text-slate-400"
                 />
-                <div className="text-xs text-blue-300">
-                  💡 <strong>Want to try it first?</strong> Enter "TEST" to see how it works with demo data (no API key needed)
+                <div className="text-xs text-blue-300 space-y-1">
+                  <div>💡 <strong>Want to try it first?</strong> Enter "TEST" to see how it works with demo data (no API key needed)</div>
+                  <div>🔍 <strong>Check your setup:</strong> Enter "IP-TEST" to verify what IP address your requests use (helpful for troubleshooting API key issues)</div>
                 </div>
               </div>
 
@@ -329,6 +340,13 @@ export default function RankerPage() {
               <div className="flex items-center gap-2 text-red-400 bg-red-900/20 p-3 rounded-lg border border-red-500/30">
                 <AlertCircle className="h-4 w-4" />
                 {error}
+              </div>
+            )}
+
+            {testResult && (
+              <div className="flex items-start gap-2 text-blue-400 bg-blue-900/20 p-3 rounded-lg border border-blue-500/30">
+                <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <pre className="text-sm whitespace-pre-wrap">{testResult}</pre>
               </div>
             )}
               </CardContent>

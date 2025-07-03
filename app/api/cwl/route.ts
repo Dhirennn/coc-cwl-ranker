@@ -144,6 +144,68 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Clan tag is required' }, { status: 400 })
     }
 
+    // IP TEST: Check what IP address is being used
+    if (clanTag.toUpperCase() === 'IP-TEST') {
+      try {
+        console.log(`🔍 IP-TEST requested - checking outbound IP`)
+        
+        // Test 1: Check our outbound IP
+        const ipResponse = await fetch('https://httpbin.org/ip', {
+          method: 'GET'
+        })
+        
+        let ipResult = 'Could not determine'
+        if (ipResponse.ok) {
+          const ipData = await ipResponse.json()
+          console.log(`📍 IP-TEST result: ${ipData.origin}`)
+          ipResult = ipData.origin
+        }
+
+        // Test 2: Test a simple request to CoC API to see if it's accessible
+        console.log(`🧪 Testing CoC API accessibility...`)
+        let apiTest = 'Not tested'
+        try {
+          const testResponse = await fetch('https://api.clashofclans.com/v1/leagues', {
+            headers: {
+              'Accept': 'application/json'
+            }
+          })
+          apiTest = testResponse.ok ? `✅ Accessible (${testResponse.status})` : `❌ Failed (${testResponse.status})`
+          console.log(`🧪 CoC API test: ${apiTest}`)
+        } catch (error) {
+          apiTest = `❌ Error: ${error}`
+          console.log(`🧪 CoC API test error: ${error}`)
+        }
+
+        // Check if we're getting the expected Render IPs
+        const expectedIPs = ['54.254.162.138', '13.228.225.19', '18.142.128.26']
+        const isExpectedIP = expectedIPs.includes(ipResult.split(',')[0].trim())
+        
+        return NextResponse.json({
+          success: true,
+          message: 'IP Address Check for Render Static IPs',
+          outboundIP: ipResult,
+          isUsingExpectedIP: isExpectedIP,
+          expectedIPs: '54.254.162.138, 13.228.225.19, 18.142.128.26',
+          cocApiTest: apiTest,
+          status: isExpectedIP ? '✅ SUCCESS: Using expected Render IP!' : '⚠️ INFO: Using different IP than expected',
+          instructions: isExpectedIP 
+            ? `✅ Perfect! Your requests are using expected Render IP: ${ipResult}. Your CoC API key should allow: 54.254.162.138, 13.228.225.19, 18.142.128.26`
+            : `ℹ️ Your requests are coming from IP: ${ipResult}. Make sure your CoC API key allows this IP address, or use the expected Render IPs: 54.254.162.138, 13.228.225.19, 18.142.128.26`,
+          platform: 'Render Web Service'
+        })
+        
+      } catch (error) {
+        console.error(`❌ IP-TEST error:`, error)
+        return NextResponse.json({
+          success: false,
+          message: 'Error checking IP address',
+          platform: 'Render Web Service',
+          error: error instanceof Error ? error.message : 'Unknown error'
+        })
+      }
+    }
+
     // TEST MODE: Use 'TEST' as clan tag to see mock data
     if (clanTag.toUpperCase() === 'TEST') {
       const mockMembers: CWLMember[] = [
