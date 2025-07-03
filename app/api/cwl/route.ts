@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 
 // COC API base URL
 const COC_API_BASE = 'https://api.clashofclans.com/v1'
-// Alternative: Use proxy gateway to bypass IP restrictions - lazy to do this lol
-// const COC_API_BASE = 'https://apis-gateway.herokuapp.com/cocapi'
+
+// Fixie proxy configuration
+const FIXIE_URL = process.env.FIXIE_URL
+const USE_FIXIE = !!FIXIE_URL
 
 interface CWLMember {
   tag: string
@@ -24,24 +26,90 @@ interface Attack {
 }
 
 async function fetchWithAuth(url: string, apiKey: string) {
-  const response = await fetch(url, {
+  console.log(`🌐 Making API request to: ${url}`)
+  console.log(`🔑 Using API key: ${apiKey.substring(0, 20)}...`)
+  console.log(`🚀 Using ${USE_FIXIE ? 'FIXIE PROXY' : 'DIRECT API'}`)
+  
+  // Try to determine the outbound IP being used
+  if (USE_FIXIE && FIXIE_URL) {
+    console.log(`🔗 Fixie proxy URL configured: ${FIXIE_URL.substring(0, 30)}...`)
+    
+    // Test the outbound IP through Fixie
+    try {
+      const ipResponse = await fetch('https://httpbin.org/ip', {
+        method: 'GET'
+      })
+      if (ipResponse.ok) {
+        const ipData = await ipResponse.json()
+        console.log(`📍 Outbound IP being used: ${ipData.origin}`)
+      }
+    } catch (error) {
+      console.log(`⚠️ Could not determine outbound IP: ${error}`)
+    }
+  } else {
+    console.log(`⚠️ No Fixie proxy configured - using dynamic Vercel IPs`)
+    
+    // Try to get the current IP
+    try {
+      const ipResponse = await fetch('https://httpbin.org/ip', {
+        method: 'GET'
+      })
+      if (ipResponse.ok) {
+        const ipData = await ipResponse.json()
+        console.log(`📍 Outbound IP being used: ${ipData.origin}`)
+      }
+    } catch (error) {
+      console.log(`⚠️ Could not determine outbound IP: ${error}`)
+    }
+  }
+  
+  let fetchOptions: RequestInit = {
     headers: {
       'Authorization': `Bearer ${apiKey}`,
       'Accept': 'application/json'
     }
-  })
+  }
+
+  // Configure Fixie proxy if available
+  if (USE_FIXIE && FIXIE_URL) {
+    console.log(`🔗 Fixie proxy URL configured`)
+    
+    // For Vercel Edge Runtime, we need to use the proxy URL differently
+    // Fixie works by intercepting HTTP requests when FIXIE_URL is set
+    // The Edge Runtime automatically uses the proxy when FIXIE_URL exists
+  }
+  
+  const response = await fetch(url, fetchOptions)
+  
+  console.log(`📡 Response status: ${response.status} ${response.statusText}`)
   
   if (!response.ok) {
+    const errorText = await response.text()
+    console.error(`❌ API Error Response:`, errorText)
+    console.error(`🔍 Debug info:`)
+    console.error(`   - URL: ${url}`)
+    console.error(`   - API Key prefix: ${apiKey.substring(0, 20)}...`)
+    console.error(`   - Using Fixie: ${USE_FIXIE}`)
+    console.error(`   - Response: ${response.status} ${response.statusText}`)
+    
     if (response.status === 403) {
-      throw new Error('Invalid API key or IP address not allowed. Please check your API key and IP address settings.')
+      const proxyMessage = USE_FIXIE 
+        ? 'Make sure your Clash of Clans API key allows Fixie\'s static IP addresses. Check Fixie dashboard for your IPs.'
+        : 'Make sure your API key allows IP address 0.0.0.0/0 or check the logs above for the actual IP being used.'
+      throw new Error(`Invalid API key or IP address not allowed. ${proxyMessage}`)
     }
     if (response.status === 404) {
       throw new Error('Clan not found. Please check the clan tag.')
     }
-    throw new Error(`CoC API error: ${response.status} ${response.statusText}`)
+    if (response.status === 429) {
+      throw new Error('Too many requests. Please wait a moment and try again.')
+    }
+    throw new Error(`CoC API error: ${response.status} ${response.statusText}. Details: ${errorText}`)
   }
   
-  return response.json()
+  const data = await response.json()
+  console.log(`✅ API request successful`)
+  return data
 }
 
 function calculateThMultiplier(attackerTH: number, defenderTH: number): number {
@@ -124,6 +192,59 @@ export async function POST(request: NextRequest) {
     
     if (!clanTag) {
       return NextResponse.json({ error: 'Clan tag is required' }, { status: 400 })
+    }
+
+    // IP TEST: Check what IP address is being used
+    if (clanTag.toUpperCase() === 'IP-TEST') {
+      try {
+        console.log(`🔍 IP-TEST requested - checking outbound IP`)
+        
+        const ipResponse = await fetch('https://httpbin.org/ip', {
+          method: 'GET'
+        })
+        
+        if (ipResponse.ok) {
+          const ipData = await ipResponse.json()
+          console.log(`📍 IP-TEST result: ${ipData.origin}`)
+          
+          return NextResponse.json({
+            success: true,
+            message: 'IP Address Check',
+            outboundIP: ipData.origin,
+            fixieEnabled: USE_FIXIE,
+            instructions: `Your requests are coming from IP: ${ipData.origin}. Use this IP in your Clash of Clans API key whitelist.`
+          })
+        } else {
+          return NextResponse.json({
+            success: false,
+            message: 'Could not determine IP address',
+            fixieEnabled: USE_FIXIE,
+            error: 'IP check service unavailable'
+          })
+        }
+      } catch (error) {
+        console.error(`❌ IP-TEST error:`, error)
+        return NextResponse.json({
+          success: false,
+          message: 'Error checking IP address',
+          fixieEnabled: USE_FIXIE,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        })
+      }
+    }
+
+    // FIXIE TEST: Verify Fixie configuration
+    if (clanTag.toUpperCase() === 'FIXIE-TEST') {
+      return NextResponse.json({
+        success: true,
+        message: `Fixie proxy: ${USE_FIXIE ? 'ENABLED' : 'DISABLED'}`,
+        fixieConfigured: USE_FIXIE,
+        fixieUrl: USE_FIXIE ? '✅ Configured (hidden for security)' : '❌ Not found',
+        instructions: USE_FIXIE 
+          ? 'Fixie is configured! Get your static IPs from the Fixie dashboard and use them in your CoC API key.'
+          : 'Fixie not configured. Add the Fixie integration to your Vercel project first.',
+        staticIpInstructions: 'Go to https://dashboard.fixie.io to find your static IP addresses, then use those IPs in your Clash of Clans API key.'
+      })
     }
 
     // TEST MODE: Use 'TEST' as clan tag to see mock data

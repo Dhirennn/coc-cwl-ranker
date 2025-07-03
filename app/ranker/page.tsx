@@ -198,7 +198,21 @@ export default function RankerPage() {
                     <li>
                       <strong>For IP Address:</strong>
                       <ul className="ml-4 mt-1 space-y-1 text-xs">
-                        <li>• <strong>Local development:</strong> Get your IP from{" "}
+                        <li>• <strong>Vercel (Recommended):</strong> Use{" "}
+                          <a 
+                            href="https://vercel.com/integrations/fixie" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-yellow-300 hover:text-yellow-200 underline inline-flex items-center gap-1"
+                          >
+                            Fixie integration
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                          {" "}for static IPs
+                        </li>
+                        <li>• <strong>Alternative 1:</strong> <code className="bg-slate-700 px-1 rounded text-yellow-300">0.0.0.0</code> (may not work)</li>
+                        <li>• <strong>Alternative 2:</strong> <code className="bg-slate-700 px-1 rounded text-yellow-300">0.0.0.0-255.255.255.255</code> (may not work)</li>
+                        <li>• <strong>Local testing:</strong> Get your IP from{" "}
                           <a 
                             href="https://whatismyipaddress.com/" 
                             target="_blank" 
@@ -209,7 +223,6 @@ export default function RankerPage() {
                             <ExternalLink className="h-3 w-3" />
                           </a>
                         </li>
-                        <li>• <strong>Deployed apps:</strong> Use <code className="bg-slate-700 px-1 rounded text-yellow-300">0.0.0.0/0</code> (allows all IPs)</li>
                       </ul>
                     </li>
                     <li>Copy-paste your API key below</li>
@@ -227,11 +240,13 @@ export default function RankerPage() {
                   <div className="bg-orange-900/30 border border-orange-500/30 rounded-lg p-3 mt-3">
                     <div className="flex items-center gap-2 text-orange-300 text-sm">
                       <AlertCircle className="h-4 w-4" />
-                      <span className="font-semibold">Deployment Tip:</span>
+                      <span className="font-semibold">Vercel Deployment:</span>
                     </div>
-                    <p className="text-orange-200 text-xs mt-1">
-                      If you get "IP address not allowed" errors, set your API key's allowed IP to <code className="bg-orange-800/50 px-1 rounded">0.0.0.0/0</code> (allows all IPs) when creating the key.
-                    </p>
+                    <div className="text-orange-200 text-xs mt-1 space-y-1">
+                      <p><strong>1. Add Fixie integration</strong> to your Vercel project (recommended)</p>
+                      <p><strong>2. Get static IPs</strong> from Fixie dashboard and use in CoC API key</p>
+                      <p><strong>3. Test with "FIXIE-TEST"</strong> clan tag to verify setup</p>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -271,7 +286,7 @@ export default function RankerPage() {
               {/* Clan Tag Input */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-yellow-300">
-                  Clan Tag
+                      Clan Tag
                 </label>
                     <Input
                 placeholder="Enter clan tag (e.g., #2ABC123)"
@@ -281,6 +296,10 @@ export default function RankerPage() {
                     />
                 <div className="text-xs text-slate-400">
                   <span className="text-yellow-300">💡 Want to try first?</span> Enter "TEST" as clan tag to see demo data (no API key needed)
+                  <br />
+                  <span className="text-blue-300">🔧 Check setup:</span> Enter "FIXIE-TEST" to verify Fixie proxy configuration
+                  <br />
+                  <span className="text-red-300">🌐 Check IP:</span> Enter "IP-TEST" to see what IP address your requests use
                 </div>
               </div>
 
