@@ -210,7 +210,7 @@ export default function RankerPage() {
                       <span className="bg-yellow-500 text-slate-900 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">2</span>
                       <div>
                         <div className="font-medium text-white">Create Your Key</div>
-                        <div className="text-sm text-blue-200">Click "Create New Key" and fill in:</div>
+                        <div className="text-sm text-blue-200">Click on "Account" and then "Create New Key" and fill in:</div>
                         <ul className="text-sm text-blue-200 mt-1 ml-4 space-y-1">
                           <li>• <strong>Name:</strong> Any name you want (e.g., "CWL Ranker")</li>
                           <li>• <strong>Description:</strong> Any description (e.g., "For ranking tool")</li>
@@ -222,9 +222,10 @@ export default function RankerPage() {
                       <span className="bg-yellow-500 text-slate-900 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">3</span>
                       <div>
                         <div className="font-medium text-white">Set IP Addresses</div>
-                        <div className="text-sm text-blue-200">Copy and paste these IPs exactly:</div>
+                        <div className="text-sm text-blue-200">Copy and paste these IPs exactly into the "Allowed IP addresses" field:</div>
                         <div className="bg-slate-700 rounded px-3 py-2 mt-1 font-mono text-yellow-300 text-sm">
-                          52.5.155.132,52.87.82.133
+                          52.5.155.132,
+                          52.87.82.133
                         </div>
                         <div className="text-xs text-slate-400 mt-1">
                           These are the website's server addresses
