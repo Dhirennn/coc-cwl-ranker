@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { initializePing } from '@/lib/ping-utils'
 
 // COC API base URL
 const COC_API_BASE = 'https://api.clashofclans.com/v1'
+
+// Track if ping has been initialized to avoid duplicate intervals
+let isPingInitialized = false
 
 interface CWLMember {
   tag: string
@@ -137,6 +141,17 @@ function normalizeClanTag(tag: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  // Initialize ping mechanism on first API call (only in production)
+  if (!isPingInitialized) {
+    try {
+      initializePing()
+      isPingInitialized = true
+      console.log('🏓 Ping mechanism initialized from CWL API')
+    } catch (error) {
+      console.error('⚠️ Failed to initialize ping mechanism:', error)
+    }
+  }
+
   try {
     const { clanTag, apiKey } = await request.json()
     
