@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Shield, Trophy, Star, Crown, Swords, Calculator, Users, AlertCircle, Loader2, Key, Eye, EyeOff, ExternalLink, Info } from "lucide-react"
 import Link from "next/link"
+import AdBanner from "@/components/AdBanner"
 
 interface CWLMember {
   tag: string
@@ -173,6 +174,21 @@ export default function RankerPage() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Top Banner Ad */}
+        <div className="mb-6">
+          <AdBanner 
+            adSlot="1234567890" 
+            adFormat="horizontal"
+            className="max-w-4xl mx-auto"
+            style={{ 
+              display: 'block',
+              width: '728px',
+              height: '90px',
+              margin: '0 auto'
+            }}
+          />
+        </div>
+
         {/* Input Section */}
         <Card className="mb-8 bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-yellow-400/30">
               <CardHeader>
@@ -313,11 +329,11 @@ export default function RankerPage() {
                 <div className="text-xs text-blue-300 space-y-1">
                   <div>💡 <strong>Want to try it first?</strong> Enter "TEST" to see how it works with demo data (no API key needed)</div>
                   <div>🔍 <strong>Check your setup:</strong> Enter "IP-TEST" to verify what IP address your requests use (helpful for troubleshooting API key issues)</div>
-                </div>
-              </div>
+                    </div>
+                  </div>
 
               {/* Submit Button */}
-                <Button
+                  <Button
                 onClick={handleAnalyzeClan}
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-slate-900 font-bold py-3 text-lg"
@@ -333,8 +349,8 @@ export default function RankerPage() {
                     Step 4: Calculate Fair Rankings
                   </>
                 )}
-                </Button>
-            </div>
+                  </Button>
+                </div>
             
             {error && (
               <div className="flex items-center gap-2 text-red-400 bg-red-900/20 p-3 rounded-lg border border-red-500/30">
@@ -351,6 +367,23 @@ export default function RankerPage() {
             )}
               </CardContent>
             </Card>
+
+        {/* Middle Banner Ad - Shows when user has input but before/after results */}
+        {(members.length > 0 || error || testResult) && (
+          <div className="mb-6">
+            <AdBanner 
+              adSlot="0987654321" 
+              adFormat="rectangle"
+              className="max-w-md mx-auto"
+              style={{ 
+                display: 'block',
+                width: '300px',
+                height: '250px',
+                margin: '0 auto'
+              }}
+            />
+          </div>
+        )}
 
         {/* Results */}
         {members.length > 0 && (
@@ -370,7 +403,7 @@ export default function RankerPage() {
                     <Badge className="bg-purple-600 text-white text-lg px-4 py-2">
                       {members.length} Warriors Analyzed
                     </Badge>
-                  </div>
+                </div>
                 </CardContent>
               </Card>
             )}
@@ -473,7 +506,22 @@ export default function RankerPage() {
                     </Table>
                   </CardContent>
                 </Card>
-          </>
+
+            {/* Bottom Banner Ad - After results */}
+            <div className="mt-8 mb-6">
+              <AdBanner 
+                adSlot="1357924680" 
+                adFormat="horizontal"
+                className="max-w-4xl mx-auto"
+                style={{ 
+                  display: 'block',
+                  width: '728px',
+                  height: '90px',
+                  margin: '0 auto'
+                }}
+              />
+                </div>
+              </>
         )}
       </div>
     </div>

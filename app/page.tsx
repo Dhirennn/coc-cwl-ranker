@@ -365,6 +365,11 @@ export default function HomePage() {
           </div>
           <div className="border-t border-slate-700 mt-8 pt-8 text-center text-slate-500">
             <p>&copy; 2024 CWL War Council. Built for fair clan management. Not affiliated with Supercell.</p>
+            <div className="mt-2 space-x-4">
+              <Link href="/privacy" className="text-slate-400 hover:text-yellow-300 text-sm underline">
+                Privacy Policy
+              </Link>
+            </div>
           </div>
         </div>
       </footer>
