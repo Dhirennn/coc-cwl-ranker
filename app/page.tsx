@@ -101,7 +101,7 @@ export default function HomePage() {
               <CardContent>
                 <p className="text-slate-300">
                   Our Town Hall Difference Multiplier encourages brave warriors to attack stronger opponents and
-                  discourages the cowardly "attack low for easy stars" strategy.
+                  discourages the "attack low for easy stars" strategy.
                 </p>
               </CardContent>
             </Card>
@@ -228,23 +228,23 @@ export default function HomePage() {
                   <ul className="text-sm text-slate-300 space-y-2">
                     <li className="flex justify-between">
                       <span>Attack +2 TH:</span>
-                      <Badge className="bg-green-600 text-white">1.3x Hero Bonus</Badge>
+                      <Badge className="bg-green-600 text-white">1.3x (2+ levels up)</Badge>
                     </li>
                     <li className="flex justify-between">
                       <span>Attack +1 TH:</span>
-                      <Badge className="bg-green-500 text-white">1.15x Brave</Badge>
+                      <Badge className="bg-green-500 text-white">1.15x (1 level up)</Badge>
                     </li>
                     <li className="flex justify-between">
-                      <span>Attack same TH:</span>
-                      <Badge className="bg-blue-500 text-white">1.0x Fair</Badge>
+                      <span>Same TH Level:</span>
+                      <Badge className="bg-blue-500 text-white">1.0x (equal match)</Badge>
                     </li>
                     <li className="flex justify-between">
                       <span>Attack -1 TH:</span>
-                      <Badge className="bg-orange-500 text-white">0.85x Weak</Badge>
+                      <Badge className="bg-orange-500 text-white">0.85x (1 level down)</Badge>
                     </li>
                     <li className="flex justify-between">
                       <span>Attack -2 TH:</span>
-                      <Badge className="bg-red-500 text-white">0.7x Coward</Badge>
+                      <Badge className="bg-red-500 text-white">0.7x (2+ levels down)</Badge>
                     </li>
                   </ul>
                 </div>

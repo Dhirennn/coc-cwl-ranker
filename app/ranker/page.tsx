@@ -36,11 +36,11 @@ export default function RankerPage() {
 
   const calculateThMultiplier = (attackerTH: number, defenderTH: number) => {
     const diff = defenderTH - attackerTH
-    if (diff >= 2) return 1.3  // Hero Bonus
-    if (diff === 1) return 1.15 // Brave
-    if (diff === 0) return 1.0  // Fair
-    if (diff === -1) return 0.85 // Weak
-    if (diff <= -2) return 0.7   // Coward
+    if (diff >= 2) return 1.3  // Attack +2TH (2+ levels up)
+    if (diff === 1) return 1.15 // Attack +1TH (1 level up)
+    if (diff === 0) return 1.0  // Same TH Level (equal match)
+    if (diff === -1) return 0.85 // Attack -1TH (1 level down)
+    if (diff <= -2) return 0.7   // Attack -2TH (2+ levels down)
     return 1.0
   }
 
@@ -68,7 +68,7 @@ export default function RankerPage() {
     const averageScore = totalPossibleAttacks > 0 ? totalScore / totalPossibleAttacks : 0
     
     // Apply participation multiplier
-    const participationMultiplier = member.warsParticipated > 0 ? Math.log(member.warsParticipated) / Math.log(7) : 0
+    const participationMultiplier = member.warsParticipated > 0 ? Math.log(member.warsParticipated + 1) / Math.log(7) : 0
     
     return averageScore * participationMultiplier
   }
@@ -117,11 +117,11 @@ export default function RankerPage() {
 
   const getThDiffBadge = (attackerTH: number, defenderTH: number) => {
     const diff = defenderTH - attackerTH
-    if (diff >= 2) return <Badge className="bg-green-600 text-white">+{diff} Hero</Badge>
-    if (diff === 1) return <Badge className="bg-green-500 text-white">+1 Brave</Badge>
+    if (diff >= 2) return <Badge className="bg-green-600 text-white">+{diff} Up</Badge>
+    if (diff === 1) return <Badge className="bg-green-500 text-white">+1 Up</Badge>
     if (diff === 0) return <Badge className="bg-blue-500 text-white">Same</Badge>
-    if (diff === -1) return <Badge className="bg-orange-500 text-white">-1 Weak</Badge>
-    return <Badge className="bg-red-500 text-white">{diff} Coward</Badge>
+    if (diff === -1) return <Badge className="bg-orange-500 text-white">-1 Down</Badge>
+    return <Badge className="bg-red-500 text-white">{diff} Down</Badge>
   }
 
   return (

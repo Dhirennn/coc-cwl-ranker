@@ -39,11 +39,11 @@ async function fetchWithAuth(url: string) {
 
 function calculateThMultiplier(attackerTH: number, defenderTH: number): number {
   const diff = defenderTH - attackerTH
-  if (diff >= 2) return 1.3  // Hero Bonus
-  if (diff === 1) return 1.15 // Brave
-  if (diff === 0) return 1.0  // Fair
-  if (diff === -1) return 0.85 // Weak
-  if (diff <= -2) return 0.7   // Coward
+  if (diff >= 2) return 1.3  // Attack +2TH (2+ levels up)
+  if (diff === 1) return 1.15 // Attack +1TH (1 level up)
+  if (diff === 0) return 1.0  // Same TH Level (equal match)
+  if (diff === -1) return 0.85 // Attack -1TH (1 level down)
+  if (diff <= -2) return 0.7   // Attack -2TH (2+ levels down)
   return 1.0
 }
 
