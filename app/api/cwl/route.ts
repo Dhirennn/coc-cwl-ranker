@@ -52,28 +52,63 @@ function calculateAttackScore(attack: Attack): number {
   const destructionDecimal = attack.destructionPercentage / 100
   const baseScore = (starPercentage * 0.75) + (destructionDecimal * 0.25)
   const thMultiplier = calculateThMultiplier(attack.attackerTH, attack.defenderTH)
-  return (baseScore * thMultiplier + 1) * 100 // +1 then *100 to match the formula
+  const finalScore = (baseScore * thMultiplier + 1) * 100 // +1 then *100 to match the formula
+  
+  console.log(`🎯 Attack Score Calculation:`)
+  console.log(`   Stars: ${attack.stars}/3 (${starPercentage.toFixed(3)})`)
+  console.log(`   Destruction: ${attack.destructionPercentage}% (${destructionDecimal.toFixed(3)})`)
+  console.log(`   TH: ${attack.attackerTH} vs ${attack.defenderTH} (diff: ${attack.defenderTH - attack.attackerTH})`)
+  console.log(`   Base Score: (${starPercentage.toFixed(3)} * 0.75) + (${destructionDecimal.toFixed(3)} * 0.25) = ${baseScore.toFixed(3)}`)
+  console.log(`   TH Multiplier: ${thMultiplier}`)
+  console.log(`   Final Score: (${baseScore.toFixed(3)} * ${thMultiplier} + 1) * 100 = ${finalScore.toFixed(2)}`)
+  console.log(``)
+  
+  return finalScore
 }
 
 function calculateMemberScore(member: CWLMember): number {
+  console.log(`\n🏆 Calculating score for ${member.name} (${member.tag})`)
+  console.log(`   TH Level: ${member.townHallLevel}`)
+  console.log(`   Wars Participated: ${member.warsParticipated}`)
+  console.log(`   Attacks Made: ${member.attacks.length}`)
+  console.log(`   Missed Attacks: ${member.missedAttacks}`)
+  
   let totalScore = 0
   
   // Add attack scores
-  member.attacks.forEach(attack => {
-    totalScore += calculateAttackScore(attack)
+  member.attacks.forEach((attack, index) => {
+    console.log(`\n   Attack ${index + 1}:`)
+    const attackScore = calculateAttackScore(attack)
+    totalScore += attackScore
+    console.log(`   Running Total: ${totalScore.toFixed(2)}`)
   })
   
   // Add missed attack penalties (-100 each)
-  totalScore += (member.missedAttacks * -100)
+  const missedPenalty = member.missedAttacks * -100
+  totalScore += missedPenalty
+  console.log(`\n   Missed Attack Penalty: ${member.missedAttacks} * -100 = ${missedPenalty}`)
+  console.log(`   Total Score After Penalties: ${totalScore.toFixed(2)}`)
   
   // Calculate average
   const totalPossibleAttacks = member.attacks.length + member.missedAttacks
   const averageScore = totalPossibleAttacks > 0 ? totalScore / totalPossibleAttacks : 0
+  console.log(`   Total Possible Attacks: ${totalPossibleAttacks}`)
+  console.log(`   Average Score: ${totalScore.toFixed(2)} / ${totalPossibleAttacks} = ${averageScore.toFixed(2)}`)
   
   // Apply participation multiplier
-  const participationMultiplier = member.warsParticipated > 0 ? Math.log(member.warsParticipated) / Math.log(7) : 0
+  const participationMultiplier = member.warsParticipated > 0 ? Math.log(member.warsParticipated + 1) / Math.log(7) : 0
+  const finalScore = averageScore * participationMultiplier
   
-  return averageScore * participationMultiplier
+  console.log(`   Participation Multiplier: log₇(${member.warsParticipated} + 1) = log₇(${member.warsParticipated + 1}) = ${participationMultiplier.toFixed(4)}`)
+  console.log(`   🎯 FINAL SCORE: ${averageScore.toFixed(2)} * ${participationMultiplier.toFixed(4)} = ${finalScore.toFixed(2)}`)
+  console.log(`\n${'='.repeat(60)}`)
+  
+  return finalScore
+}
+
+// Helper function to normalize clan tags for comparison
+function normalizeClanTag(tag: string): string {
+  return tag.replace('#', '').toUpperCase()
 }
 
 export async function POST(request: NextRequest) {
@@ -221,14 +256,37 @@ export async function POST(request: NextRequest) {
     })
 
     // Process each war
-    wars.forEach((war: any) => {
-      if (!war || !war.clan || !war.opponent) return
+    console.log(`\n🏰 Processing ${wars.length} wars for clan ${clanTag}`)
+    wars.forEach((war: any, warIndex: number) => {
+      if (!war || !war.clan || !war.opponent) {
+        console.log(`⚠️ War ${warIndex + 1}: Invalid war data, skipping`)
+        return
+      }
+
+      // Check if our clan is participating in this specific war
+      const clanInWar = normalizeClanTag(war.clan.tag) === normalizeClanTag(clanTag)
+      const opponentInWar = normalizeClanTag(war.opponent.tag) === normalizeClanTag(clanTag)
+      
+      if (!clanInWar && !opponentInWar) {
+        console.log(`⚠️ War ${warIndex + 1}: ${war.clan.name} vs ${war.opponent.name} - Our clan not participating, skipping`)
+        return
+      }
 
       // Determine which clan is ours
-      const ourClan = war.clan.tag === clanTag ? war.clan : war.opponent
-      const enemyClan = war.clan.tag === clanTag ? war.opponent : war.clan
-      
-      if (!ourClan) return
+      const ourClan = clanInWar ? war.clan : war.opponent
+      const enemyClan = clanInWar ? war.opponent : war.clan
+
+      console.log(`\n⚔️ War ${warIndex + 1}: ${ourClan.name} vs ${enemyClan.name}`)
+      console.log(`   State: ${war.state}`)
+      console.log(`   Attacks per member: ${war.attacksPerMember || 2}`)
+      console.log(`   Our clan members in war: ${ourClan.members?.length || 0}`)
+
+      // Only count wars where attacks can be made (not preparation phase)
+      const canAttack = war.state === 'inWar' || war.state === 'warEnded'
+      if (!canAttack) {
+        console.log(`   ⏳ War in preparation phase - skipping attack calculations`)
+        return
+      }
 
       // Track participation
       ourClan.members?.forEach((member: any) => {
@@ -236,26 +294,43 @@ export async function POST(request: NextRequest) {
           const memberData = memberMap.get(member.tag)!
           memberData.warsParticipated++
           
-          // Calculate expected attacks (usually 2 per war)
-          const expectedAttacks = war.attacksPerMember || 2
+          console.log(`\n   👤 ${member.name} (${member.tag}) - TH${member.townhallLevel}`)
+          
+          // Calculate expected attacks (CWL gives 1 attack per member per war)
+          const expectedAttacks = 1
           const actualAttacks = member.attacks?.length || 0
-          memberData.missedAttacks += Math.max(0, expectedAttacks - actualAttacks)
+          const missedInThisWar = Math.max(0, expectedAttacks - actualAttacks)
+          memberData.missedAttacks += missedInThisWar
+          
+          console.log(`      Expected attacks: ${expectedAttacks}, Made: ${actualAttacks}, Missed: ${missedInThisWar}`)
           
           // Process attacks
-          member.attacks?.forEach((attack: any) => {
+          member.attacks?.forEach((attack: any, attackIndex: number) => {
             // Find defender info
             const defender = enemyClan.members?.find((m: any) => m.tag === attack.defenderTag)
             if (defender) {
-              memberData.attacks.push({
+              const attackData = {
                 stars: attack.stars,
                 destructionPercentage: attack.destructionPercentage,
                 defenderTH: defender.townhallLevel,
                 attackerTH: member.townhallLevel
-              })
+              }
+              memberData.attacks.push(attackData)
+              
+              console.log(`      Attack ${attackIndex + 1}: ${attack.stars}⭐ ${attack.destructionPercentage}% vs TH${defender.townhallLevel}`)
+            } else {
+              console.log(`      ⚠️ Attack ${attackIndex + 1}: Could not find defender ${attack.defenderTag}`)
             }
           })
+        } else {
+          console.log(`   ⚠️ Member ${member.name} (${member.tag}) not found in clan member list`)
         }
       })
+    })
+
+    console.log(`\n📊 Final member data summary:`)
+    memberMap.forEach((member, tag) => {
+      console.log(`   ${member.name}: ${member.warsParticipated} wars, ${member.attacks.length} attacks, ${member.missedAttacks} missed`)
     })
 
     // Calculate final scores and rankings

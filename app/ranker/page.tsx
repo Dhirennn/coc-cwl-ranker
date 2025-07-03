@@ -146,30 +146,30 @@ export default function RankerPage() {
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Input Section */}
         <Card className="mb-8 bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-yellow-400/30">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-3 text-yellow-300">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3 text-yellow-300">
               <div className="bg-gradient-to-br from-yellow-500 to-orange-500 p-2 rounded-lg">
                 <Calculator className="h-6 w-6 text-white" />
-              </div>
+                  </div>
               Enter the War Room
-            </CardTitle>
-            <CardDescription className="text-blue-200">
+                </CardTitle>
+                <CardDescription className="text-blue-200">
               Enter your clan tag to calculate fair CWL bonus rankings based on mathematical performance analysis
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex gap-4">
-              <Input
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex gap-4">
+                    <Input
                 placeholder="Enter clan tag (e.g., #2ABC123)"
-                value={clanTag}
-                onChange={(e) => setClanTag(e.target.value)}
+                      value={clanTag}
+                      onChange={(e) => setClanTag(e.target.value)}
                 className="flex-1 bg-slate-900/50 border-blue-500/30 text-white placeholder:text-slate-400"
-              />
-              <Button
+                    />
+                <Button
                 onClick={handleAnalyzeClan}
                 disabled={loading}
                 className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-slate-900 font-bold px-8"
-              >
+                >
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -181,7 +181,7 @@ export default function RankerPage() {
                     Calculate Rankings
                   </>
                 )}
-              </Button>
+                </Button>
             </div>
             
             {error && (
@@ -190,8 +190,8 @@ export default function RankerPage() {
                 {error}
               </div>
             )}
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
 
         {/* Results */}
         {members.length > 0 && (
@@ -228,8 +228,8 @@ export default function RankerPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
+                    <Table>
+                      <TableHeader>
                     <TableRow className="border-slate-700">
                       <TableHead className="text-yellow-300">Rank</TableHead>
                       <TableHead className="text-yellow-300">Warrior</TableHead>
@@ -238,13 +238,13 @@ export default function RankerPage() {
                       <TableHead className="text-yellow-300">Attacks</TableHead>
                       <TableHead className="text-yellow-300">Battle Score</TableHead>
                       <TableHead className="text-yellow-300">Attack Details</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
                     {members.map((member) => (
                       <TableRow key={member.tag} className="border-slate-700 hover:bg-slate-800/50">
-                        <TableCell>
-                          <div className="flex items-center gap-2">
+                            <TableCell>
+                              <div className="flex items-center gap-2">
                             {member.rank === 1 && <Crown className="h-5 w-5 text-yellow-400" />}
                             {member.rank === 2 && <Trophy className="h-5 w-5 text-slate-300" />}
                             {member.rank === 3 && <Trophy className="h-5 w-5 text-orange-600" />}
@@ -257,20 +257,20 @@ export default function RankerPage() {
                           <div>
                             <div className="font-semibold text-white">{member.name}</div>
                             <div className="text-xs text-slate-400">{member.tag}</div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
+                              </div>
+                            </TableCell>
+                            <TableCell>
                           <Badge className="bg-slate-700 text-yellow-300">
                             TH{member.townHallLevel}
-                          </Badge>
-                        </TableCell>
+                              </Badge>
+                            </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
                             <Users className="h-4 w-4 text-blue-400" />
                             <span className="text-blue-300">{member.warsParticipated}</span>
                           </div>
                         </TableCell>
-                        <TableCell>
+                            <TableCell>
                           <div className="space-y-1">
                             <div className="flex items-center gap-1">
                               <Swords className="h-4 w-4 text-green-400" />
@@ -283,8 +283,8 @@ export default function RankerPage() {
                               </div>
                             )}
                           </div>
-                        </TableCell>
-                        <TableCell>
+                            </TableCell>
+                            <TableCell>
                           <div className="text-right">
                             <div className={`text-xl font-bold ${getScoreColor(member.score, member.rank)}`}>
                               {member.score.toFixed(1)}
@@ -293,8 +293,8 @@ export default function RankerPage() {
                               log₇({member.warsParticipated}) participation
                             </div>
                           </div>
-                        </TableCell>
-                        <TableCell>
+                            </TableCell>
+                            <TableCell>
                           <div className="space-y-1">
                             {member.attacks.map((attack, i) => (
                               <div key={i} className="flex items-center gap-2 text-xs">
@@ -307,13 +307,13 @@ export default function RankerPage() {
                               </div>
                             ))}
                           </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
           </>
         )}
       </div>
