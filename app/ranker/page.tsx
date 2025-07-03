@@ -222,13 +222,16 @@ export default function RankerPage() {
                       <span className="bg-yellow-500 text-slate-900 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">3</span>
                       <div>
                         <div className="font-medium text-white">Set IP Addresses</div>
-                        <div className="text-sm text-blue-200">Copy and paste these IPs exactly into the "Allowed IP addresses" field:</div>
-                        <div className="bg-slate-700 rounded px-3 py-2 mt-1 font-mono text-yellow-300 text-sm">
-                          52.5.155.132,
-                          52.87.82.133
+                        <div className="text-sm text-blue-200">Copy and paste the IP addresses from your Render dashboard:</div>
+                        <div className="bg-slate-700 rounded px-3 py-2 mt-1 text-yellow-300 text-sm">
+                          <div className="font-mono">
+                            Find your static IPs in:
+                            <br />
+                            Render Dashboard → Your Service → Settings → Static IPs
+                          </div>
                         </div>
                         <div className="text-xs text-slate-400 mt-1">
-                          These are the website's server addresses
+                          Render provides static IP addresses that don't change
                         </div>
                       </div>
                     </div>

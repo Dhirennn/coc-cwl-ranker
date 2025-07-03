@@ -1,99 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// Use Node.js runtime for Fixie proxy support
-export const runtime = 'nodejs'
-
 // COC API base URL
 const COC_API_BASE = 'https://api.clashofclans.com/v1'
-
-// Fixie proxy configuration
-const FIXIE_URL = process.env.FIXIE_URL
-const USE_FIXIE = !!FIXIE_URL
-
-// Create a custom fetch function that uses proxy when available
-async function customFetch(url: string, options: RequestInit = {}): Promise<Response> {
-  if (USE_FIXIE && FIXIE_URL) {
-    console.log(`🔗 Using Fixie proxy for request to: ${url}`)
-    
-    try {
-      // Use native Node.js modules to make the request through proxy
-      const https = require('https')
-      const http = require('http')
-      const { URL } = require('url')
-      
-      const proxyUrl = new URL(FIXIE_URL)
-      const targetUrl = new URL(url)
-      
-      return new Promise((resolve, reject) => {
-        // Create CONNECT tunnel for HTTPS requests
-        const proxyReq = http.request({
-          host: proxyUrl.hostname,
-          port: proxyUrl.port || 80,
-          method: 'CONNECT',
-          path: `${targetUrl.hostname}:${targetUrl.port || 443}`,
-          headers: {
-            'Proxy-Authorization': 'Basic ' + Buffer.from(`${proxyUrl.username}:${proxyUrl.password}`).toString('base64'),
-            'Host': `${targetUrl.hostname}:${targetUrl.port || 443}`
-          }
-        })
-        
-        proxyReq.on('connect', (res: any, socket: any) => {
-          // Now make the actual HTTPS request through the tunnel
-          const req = https.request({
-            socket: socket,
-            host: targetUrl.hostname,
-            port: targetUrl.port || 443,
-            method: options.method || 'GET',
-            path: targetUrl.pathname + (targetUrl.search || ''),
-            headers: options.headers as Record<string, string>
-          }, (response: any) => {
-            let data = ''
-            response.on('data', (chunk: any) => {
-              data += chunk
-            })
-            response.on('end', () => {
-              // Create a Response-like object
-              const responseObj = {
-                ok: response.statusCode >= 200 && response.statusCode < 300,
-                status: response.statusCode,
-                statusText: response.statusMessage,
-                headers: new Headers(response.headers),
-                json: async () => JSON.parse(data),
-                text: async () => data
-              } as Response
-              
-              resolve(responseObj)
-            })
-          })
-          
-          req.on('error', reject)
-          
-          // Send request body if present
-          if (options.body) {
-            req.write(options.body)
-          }
-          req.end()
-        })
-        
-        proxyReq.on('error', (error: any) => {
-          console.log(`⚠️ Proxy tunnel failed: ${error}`)
-          reject(error)
-        })
-        
-        proxyReq.end()
-      })
-      
-    } catch (error) {
-      console.log(`⚠️ Custom proxy request failed: ${error}`)
-      console.log(`⚠️ Falling back to direct request`)
-      // Fallback to direct request
-      return fetch(url, options)
-    }
-  } else {
-    // Direct request without proxy
-    return fetch(url, options)
-  }
-}
 
 interface CWLMember {
   tag: string
@@ -116,21 +24,16 @@ interface Attack {
 async function fetchWithAuth(url: string, apiKey: string) {
   console.log(`🌐 Making API request to: ${url}`)
   console.log(`🔑 Using API key: ${apiKey.substring(0, 20)}...`)
-  console.log(`🚀 Using ${USE_FIXIE ? 'FIXIE PROXY' : 'DIRECT API'}`)
+  console.log(`🚀 Using Render's static IP`)
   
-  if (USE_FIXIE && FIXIE_URL) {
-    console.log(`🔗 Fixie configured - requests should use: 52.5.155.132 or 52.87.82.133`)
-  }
-  
-  let fetchOptions: RequestInit = {
+  const fetchOptions: RequestInit = {
     headers: {
       'Authorization': `Bearer ${apiKey}`,
       'Accept': 'application/json'
     }
   }
 
-  // Use our custom fetch that supports proxy
-  const response = await customFetch(url, fetchOptions)
+  const response = await fetch(url, fetchOptions)
   
   console.log(`📡 Response status: ${response.status} ${response.statusText}`)
   
@@ -140,15 +43,10 @@ async function fetchWithAuth(url: string, apiKey: string) {
     console.error(`🔍 Debug info:`)
     console.error(`   - URL: ${url}`)
     console.error(`   - API Key prefix: ${apiKey.substring(0, 20)}...`)
-    console.error(`   - Using Fixie: ${USE_FIXIE}`)
-    console.error(`   - FIXIE_URL exists: ${!!FIXIE_URL}`)
     console.error(`   - Response: ${response.status} ${response.statusText}`)
     
     if (response.status === 403) {
-      const proxyMessage = USE_FIXIE 
-        ? 'Make sure your Clash of Clans API key allows Fixie\'s static IP addresses: 52.5.155.132, 52.87.82.133'
-        : 'Make sure your API key allows IP address 0.0.0.0/0 or check the logs above for the actual IP being used.'
-      throw new Error(`Invalid API key or IP address not allowed. ${proxyMessage}`)
+      throw new Error(`Invalid API key or IP address not allowed. Make sure your Clash of Clans API key allows Render's static IP addresses. Check your Render dashboard for the current static IPs.`)
     }
     if (response.status === 404) {
       throw new Error('Clan not found. Please check the clan tag.')
@@ -244,88 +142,6 @@ export async function POST(request: NextRequest) {
     
     if (!clanTag) {
       return NextResponse.json({ error: 'Clan tag is required' }, { status: 400 })
-    }
-
-    // IP TEST: Check what IP address is being used
-    if (clanTag.toUpperCase() === 'IP-TEST') {
-      try {
-        console.log(`🔍 IP-TEST requested - checking outbound IP`)
-        console.log(`🔗 FIXIE_URL: ${FIXIE_URL ? 'SET' : 'NOT SET'}`)
-        console.log(`🔗 HTTP_PROXY: ${process.env.HTTP_PROXY ? 'SET' : 'NOT SET'}`)
-        console.log(`🔗 HTTPS_PROXY: ${process.env.HTTPS_PROXY ? 'SET' : 'NOT SET'}`)
-        
-        // Test 1: Check our outbound IP
-        const ipResponse = await customFetch('https://httpbin.org/ip', {
-          method: 'GET'
-        })
-        
-        let ipResult = 'Could not determine'
-        if (ipResponse.ok) {
-          const ipData = await ipResponse.json()
-          console.log(`📍 IP-TEST result: ${ipData.origin}`)
-          ipResult = ipData.origin
-        }
-
-        // Test 2: Test a simple request to CoC API to see if it goes through Fixie
-        console.log(`🧪 Testing CoC API accessibility...`)
-        let apiTest = 'Not tested'
-        try {
-          const testResponse = await customFetch('https://api.clashofclans.com/v1/leagues', {
-            headers: {
-              'Accept': 'application/json'
-            }
-          })
-          apiTest = testResponse.ok ? `✅ Accessible (${testResponse.status})` : `❌ Failed (${testResponse.status})`
-          console.log(`🧪 CoC API test: ${apiTest}`)
-        } catch (error) {
-          apiTest = `❌ Error: ${error}`
-          console.log(`🧪 CoC API test error: ${error}`)
-        }
-
-        // Check if we're getting the expected Fixie IPs
-        const isFixieIP = ipResult === '52.5.155.132' || ipResult === '52.87.82.133'
-        
-        return NextResponse.json({
-          success: true,
-          message: 'IP Address and Fixie Debug Check',
-          outboundIP: ipResult,
-          isUsingFixieIP: isFixieIP,
-          fixieEnabled: USE_FIXIE,
-          fixieUrl: FIXIE_URL ? '✅ Configured' : '❌ Not found',
-          httpProxy: process.env.HTTP_PROXY ? '✅ Set' : '❌ Not set',
-          httpsProxy: process.env.HTTPS_PROXY ? '✅ Set' : '❌ Not set',
-          cocApiTest: apiTest,
-          expectedIPs: '52.5.155.132, 52.87.82.133',
-          status: isFixieIP ? '✅ SUCCESS: Using Fixie IPs!' : '❌ WARNING: Not using Fixie IPs',
-          instructions: isFixieIP 
-            ? `✅ Perfect! Your requests are using Fixie IP: ${ipResult}. Use 52.5.155.132,52.87.82.133 in your CoC API key.`
-            : `❌ Issue: Getting IP ${ipResult} instead of Fixie IPs. Check proxy configuration.`
-        })
-        
-      } catch (error) {
-        console.error(`❌ IP-TEST error:`, error)
-        return NextResponse.json({
-          success: false,
-          message: 'Error checking IP address',
-          fixieEnabled: USE_FIXIE,
-          fixieUrl: FIXIE_URL ? '✅ Configured' : '❌ Not found',
-          error: error instanceof Error ? error.message : 'Unknown error'
-        })
-      }
-    }
-
-    // FIXIE TEST: Verify Fixie configuration
-    if (clanTag.toUpperCase() === 'FIXIE-TEST') {
-      return NextResponse.json({
-        success: true,
-        message: `Fixie proxy: ${USE_FIXIE ? 'ENABLED' : 'DISABLED'}`,
-        fixieConfigured: USE_FIXIE,
-        fixieUrl: USE_FIXIE ? '✅ Configured (hidden for security)' : '❌ Not found',
-        instructions: USE_FIXIE 
-          ? 'Fixie is configured! Get your static IPs from the Fixie dashboard and use them in your CoC API key.'
-          : 'Fixie not configured. Add the Fixie integration to your Vercel project first.',
-        staticIpInstructions: 'Go to https://dashboard.fixie.io to find your static IP addresses, then use those IPs in your Clash of Clans API key.'
-      })
     }
 
     // TEST MODE: Use 'TEST' as clan tag to see mock data

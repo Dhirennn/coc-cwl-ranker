@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: cwl-war-council
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXTAUTH_URL
+        fromService:
+          type: web
+          name: cwl-war-council
+          property: host
+    domains:
+      - clashwarcouncil.com 

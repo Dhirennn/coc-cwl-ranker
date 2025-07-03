@@ -1,0 +1,3667 @@
+Clash of Clans API
+Check out Getting Started for instructions and links to other resources. Clash of Clans API uses JSON Web Tokens for authorizing the requests. Tokens are created by developers on My Account page and must be passed in every API request in Authorization HTTP header using Bearer authentication scheme. Correct Authorization header looks like this: "Authorization: Bearer API_TOKEN".
+
+Terms of service
+clans
+Access clan specific information
+
+HELP ME make it... the above is the API documentation
+
+GET
+/clans/{clanTag}/currentwar/leaguegroup
+Retrieve information about clan's current clan war league group
+Retrieve information about clan's current clan war league group
+
+Parameters
+Name	Description
+clanTag *
+string
+(path)
+Tag of the clan.
+
+clanTag
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+ClanWarLeagueGroup{
+tag	string
+state	string
+Enum:
+Array [ 5 ]
+season	string
+clans	ClanWarLeagueClanList[...]
+rounds	ClanWarLeagueRoundList[...]
+}
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/clanwarleagues/wars/{warTag}
+Retrieve information about individual clan war league war
+Retrieve information about individual clan war league war
+
+Parameters
+Name	Description
+warTag *
+string
+(path)
+Tag of the war.
+
+warTag
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+ClanWarLeagueGroup{
+tag	string
+state	string
+Enum:
+Array [ 5 ]
+season	string
+clans	ClanWarLeagueClanList[...]
+rounds	ClanWarLeagueRoundList[...]
+}
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/clans/{clanTag}/warlog
+Retrieve clan's clan war log
+Retrieve clan's clan war log
+
+Parameters
+Name	Description
+clanTag *
+string
+(path)
+Tag of the clan.
+
+clanTag
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+ClanWarLog[ClanWarLogEntry{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/clans
+Search clans
+Search all clans by name and/or filtering the results using various criteria. At least one filtering criteria must be defined and if name is used as part of search, it is required to be at least three characters long. It is not possible to specify ordering for results so clients should not rely on any specific ordering as that may change in the future releases of the API.
+
+Parameters
+Name	Description
+name
+string
+(query)
+Search clans by name. If name is used as part of search query, it needs to be at least three characters long. Name search parameter is interpreted as wild card search, so it may appear anywhere in the clan name.
+
+name
+warFrequency
+string
+(query)
+Filter by clan war frequency
+
+warFrequency
+locationId
+integer
+(query)
+Filter by clan location identifier. For list of available locations, refer to getLocations operation.
+
+locationId
+minMembers
+integer
+(query)
+Filter by minimum number of clan members
+
+minMembers
+maxMembers
+integer
+(query)
+Filter by maximum number of clan members
+
+maxMembers
+minClanPoints
+integer
+(query)
+Filter by minimum amount of clan points.
+
+minClanPoints
+minClanLevel
+integer
+(query)
+Filter by minimum clan level.
+
+minClanLevel
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+labelIds
+string
+(query)
+Comma separatered list of label IDs to use for filtering results.
+
+labelIds
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+ClanList[Clan{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/clans/{clanTag}/currentwar
+Retrieve information about clan's current clan war
+Retrieve information about clan's current clan war
+
+Parameters
+Name	Description
+clanTag *
+string
+(path)
+Tag of the clan.
+
+clanTag
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+ClanWar{
+clan	WarClan{...}
+opponent	WarClan{...}
+teamSize	integer
+attacksPerMember	integer
+battleModifier	string
+Enum:
+Array [ 2 ]
+startTime	string
+state	string
+Enum:
+Array [ 10 ]
+endTime	string
+preparationStartTime	string
+}
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/clans/{clanTag}
+Get clan information
+Get information about a single clan by clan tag. Clan tags can be found using clan search operation. Note that clan tags start with hash character '#' and that needs to be URL-encoded properly to work in URL, so for example clan tag '#2ABC' would become '%232ABC' in the URL.
+
+Parameters
+Name	Description
+clanTag *
+string
+(path)
+Tag of the clan.
+
+clanTag
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+Clan{
+warLeague	WarLeague{...}
+capitalLeague	CapitalLeague{...}
+memberList	ClanMemberList[...]
+tag	string
+warFrequency	string
+Enum:
+Array [ 7 ]
+clanLevel	integer
+warWinStreak	integer
+warWins	integer
+warTies	integer
+warLosses	integer
+chatLanguage	Language{...}
+clanBuilderBasePoints	integer
+clanCapitalPoints	integer
+requiredTrophies	integer
+requiredBuilderBaseTrophies	integer
+clanPoints	integer
+requiredTownhallLevel	integer
+isFamilyFriendly	boolean
+isWarLogPublic	boolean
+labels	LabelList[...]
+name	string
+location	Location{...}
+type	string
+Enum:
+Array [ 3 ]
+members	integer
+description	string
+clanCapital	ClanCapital{...}
+badgeUrls	{...}
+}
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/clans/{clanTag}/members
+List clan members
+List clan members.
+
+Parameters
+Name	Description
+clanTag *
+string
+(path)
+Tag of the clan.
+
+clanTag
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+ClanMemberList[ClanMember{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/clans/{clanTag}/capitalraidseasons
+Retrieve clan's capital raid seasons
+Retrieve clan's capital raid seasons
+
+Parameters
+Name	Description
+clanTag *
+string
+(path)
+Tag of the clan.
+
+clanTag
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+ClanCapitalRaidSeasons[ClanCapitalRaidSeason{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+players
+Access player specific information
+
+
+
+GET
+/players/{playerTag}
+Get player information
+Get information about a single player by player tag. Player tags can be found either in game or by from clan member lists. Note that player tags start with hash character '#' and that needs to be URL-encoded properly to work in URL, so for example player tag '#2ABC' would become '%232ABC' in the URL.
+
+Parameters
+Name	Description
+playerTag *
+string
+(path)
+Tag of the player.
+
+playerTag
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+Player{
+league	League{...}
+builderBaseLeague	BuilderBaseLeague{...}
+clan	PlayerClan{...}
+role	string
+Enum:
+Array [ 5 ]
+warPreference	string
+Enum:
+Array [ 2 ]
+attackWins	integer
+defenseWins	integer
+townHallLevel	integer
+townHallWeaponLevel	integer
+legendStatistics	PlayerLegendStatistics{...}
+troops	PlayerItemLevelList[...]
+heroes	PlayerItemLevelList[...]
+heroEquipment	PlayerItemLevelList[...]
+spells	PlayerItemLevelList[...]
+labels	LabelList[...]
+tag	string
+name	string
+expLevel	integer
+trophies	integer
+bestTrophies	integer
+donations	integer
+donationsReceived	integer
+builderHallLevel	integer
+builderBaseTrophies	integer
+bestBuilderBaseTrophies	integer
+warStars	integer
+achievements	PlayerAchievementProgressList[...]
+clanCapitalContributions	integer
+playerHouse	PlayerHouse{...}
+}
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+POST
+/players/{playerTag}/verifytoken
+Verify player API token that can be found from the game settings.
+Verify player API token that can be found from the game settings. This API call can be used to check that players own the game accounts they claim to own as they need to provide the one-time use API token that exists inside the game.
+
+Parameters
+Name	Description
+playerTag *
+string
+(path)
+Tag of the player.
+
+playerTag
+body *
+object
+(body)
+Request body
+
+Edit Value
+Model
+{
+  "token": "string"
+}
+Cancel
+Parameter content type
+
+application/json
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+VerifyTokenResponse{
+tag	string
+token	string
+status	string
+}
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+leagues
+Access league information
+
+
+
+GET
+/capitalleagues
+List capital leagues
+List capital leagues
+
+Parameters
+Name	Description
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+CapitalLeagueList[CapitalLeague{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/leagues
+List leagues
+List leagues
+
+Parameters
+Name	Description
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+LeagueList[League{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/leagues/{leagueId}/seasons/{seasonId}
+Get league season rankings
+Get league season rankings. Note that league season information is available only for Legend League.
+
+Parameters
+Name	Description
+leagueId *
+string
+(path)
+Identifier of the league.
+
+leagueId
+seasonId *
+string
+(path)
+Identifier of the season.
+
+seasonId
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+PlayerRankingList[PlayerRanking{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/capitalleagues/{leagueId}
+Get capital league information
+Get capital league information
+
+Parameters
+Name	Description
+leagueId *
+string
+(path)
+Identifier of the league.
+
+leagueId
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+CapitalLeague{
+name	JsonLocalizedName{...}
+id	integer
+}
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/builderbaseleagues/{leagueId}
+Get Builder Base league information
+Get Builder Base league information
+
+Parameters
+Name	Description
+leagueId *
+string
+(path)
+Identifier of the league.
+
+leagueId
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+BuilderBaseLeague{
+name	JsonLocalizedName{...}
+id	integer
+}
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/builderbaseleagues
+List Builder Base leagues
+List Builder Base leagues
+
+Parameters
+Name	Description
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+BuilderBaseLeagueList[BuilderBaseLeague{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/leagues/{leagueId}
+Get league information
+Get league information
+
+Parameters
+Name	Description
+leagueId *
+string
+(path)
+Identifier of the league.
+
+leagueId
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+League{
+name	JsonLocalizedName{...}
+id	integer
+iconUrls	{...}
+}
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/leagues/{leagueId}/seasons
+Get league seasons
+Get league seasons. Note that league season information is available only for Legend League.
+
+Parameters
+Name	Description
+leagueId *
+string
+(path)
+Identifier of the league.
+
+leagueId
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+LeagueSeasonList[LeagueSeason{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/warleagues/{leagueId}
+Get war league information
+Get war league information
+
+Parameters
+Name	Description
+leagueId *
+string
+(path)
+Identifier of the league.
+
+leagueId
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+WarLeague{
+name	JsonLocalizedName{...}
+id	integer
+}
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/warleagues
+List war leagues
+List war leagues
+
+Parameters
+Name	Description
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+WarLeagueList[WarLeague{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+locations
+Access global and local rankings
+
+
+
+GET
+/locations/{locationId}/rankings/clans
+Get clan rankings for a specific location
+Get clan rankings for a specific location
+
+Parameters
+Name	Description
+locationId *
+string
+(path)
+Identifier of the location to retrieve.
+
+locationId
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+ClanRankingList[ClanRanking{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/locations/{locationId}/rankings/players
+Get player rankings for a specific location
+Get player rankings for a specific location
+
+Parameters
+Name	Description
+locationId *
+string
+(path)
+Identifier of the location to retrieve.
+
+locationId
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+PlayerRankingList[PlayerRanking{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/locations/{locationId}/rankings/players-builder-base
+Get player Builder Base rankings for a specific location
+Get player Builder Base rankings for a specific location
+
+Parameters
+Name	Description
+locationId *
+string
+(path)
+Identifier of the location to retrieve.
+
+locationId
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+PlayerBuilderBaseRankingList[PlayerBuilderBaseRanking{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/locations/{locationId}/rankings/clans-builder-base
+Get clan Builder Base rankings for a specific location
+Get clan Builder Base rankings for a specific location
+
+Parameters
+Name	Description
+locationId *
+string
+(path)
+Identifier of the location to retrieve.
+
+locationId
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+ClanBuilderBaseRankingList[ClanBuilderBaseRanking{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/locations
+List locations
+List locations
+
+Parameters
+Name	Description
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+LocationList[Location{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/locations/{locationId}/rankings/capitals
+Get capital rankings for a specific location
+Get capital rankings for a specific location
+
+Parameters
+Name	Description
+locationId *
+string
+(path)
+Identifier of the location to retrieve.
+
+locationId
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+ClanCapitalRankingList[ClanCapitalRanking{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/locations/{locationId}
+Get location information
+Get information about specific location
+
+Parameters
+Name	Description
+locationId *
+string
+(path)
+Identifier of the location to retrieve.
+
+locationId
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+Location{
+localizedName	string
+id	integer
+name	string
+isCountry	boolean
+countryCode	string
+}
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+goldpass
+Access information about gold pass
+
+
+
+GET
+/goldpass/seasons/current
+Get information about the current gold pass season.
+Get information about the current gold pass season.
+
+Parameters
+No parameters
+
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+GoldPassSeason{
+startTime	string
+endTime	string
+}
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+esports
+Esports related APIs
+
+
+labels
+
+
+GET
+/labels/players
+List player labels
+List player labels
+
+Parameters
+Name	Description
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+LabelList[Label{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+GET
+/labels/clans
+List clan labels
+List clan labels
+
+Parameters
+Name	Description
+limit
+integer
+(query)
+Limit the number of items returned in the response.
+
+limit
+after
+string
+(query)
+Return only items that occur after this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+after
+before
+string
+(query)
+Return only items that occur before this marker. Before marker can be found from the response, inside the 'paging' property. Note that only after or before can be specified for a request, not both.
+
+before
+Execute
+Responses
+Response content type
+
+application/json
+Code	Description
+200	
+Successful response
+
+Example Value
+Model
+LabelList[Label{...}]
+400	
+Client provided incorrect parameters for the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+403	
+Access denied, either because of missing/incorrect credentials or used API token does not grant access to the requested resource.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+404	
+Resource was not found.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+429	
+Request was throttled, because amount of requests was above the threshold defined for the used API token.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+500	
+Unknown error happened when handling the request.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+503	
+Service is temprorarily unavailable because of maintenance.
+
+Example Value
+Model
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
+
+Models
+WarLeagueList[WarLeagueList{
+name	JsonLocalizedName{...}
+id	integer
+}]
+WarLeague{
+name	JsonLocalizedName{...}
+id	integer
+}
+JsonLocalizedName{
+}
+ServiceVersion{
+major	integer
+minor	integer
+content	integer
+}
+LabelList
+Label{
+name	JsonLocalizedName{...}
+id	integer
+iconUrls	{...}
+}
+ClanCapitalRaidSeasons[...]
+ClanCapitalRaidSeason{
+attackLog	ClanCapitalRaidSeasonAttackLogList[...]
+defenseLog	ClanCapitalRaidSeasonDefenseLogList[...]
+state	string
+startTime	string
+endTime	string
+capitalTotalLoot	integer
+raidsCompleted	integer
+totalAttacks	integer
+enemyDistrictsDestroyed	integer
+offensiveReward	integer
+defensiveReward	integer
+members	ClanCapitalRaidSeasonMemberList[...]
+}
+ClanCapitalRaidSeasonMemberList[...]
+ClanCapitalRaidSeasonMember{
+tag	string
+name	string
+attacks	integer
+attackLimit	integer
+bonusAttackLimit	integer
+capitalResourcesLooted	integer
+}
+ClanCapitalRaidSeasonDefenseLogList[...]
+ClanCapitalRaidSeasonDefenseLogEntry{
+attacker	ClanCapitalRaidSeasonClanInfo{...}
+attackCount	integer
+districtCount	integer
+districtsDestroyed	integer
+districts	ClanCapitalRaidSeasonDistrictList[...]
+}
+ClanCapitalRaidSeasonDistrictList[...]
+ClanCapitalRaidSeasonDistrict{
+stars	integer
+name	JsonLocalizedName{...}
+id	integer
+destructionPercent	integer
+attackCount	integer
+totalLooted	integer
+attacks	ClanCapitalRaidSeasonAttackList[...]
+districtHallLevel	integer
+}
+ClanCapitalRaidSeasonAttackList[...]
+ClanCapitalRaidSeasonAttack{
+attacker	ClanCapitalRaidSeasonAttacker{...}
+destructionPercent	integer
+stars	integer
+}
+ClanCapitalRaidSeasonAttacker
+ClanCapitalRaidSeasonClanInfo{
+tag	string
+name	string
+level	integer
+badgeUrls	{...}
+}
+ClanCapitalRaidSeasonAttackLogList[...]
+ClanCapitalRaidSeasonAttackLogEntry{
+defender	ClanCapitalRaidSeasonClanInfo{...}
+attackCount	integer
+districtCount	integer
+districtsDestroyed	integer
+districts	ClanCapitalRaidSeasonDistrictList[...]
+}
+Location{
+localizedName	string
+id	integer
+name	string
+isCountry	boolean
+countryCode	string
+}
+Replay{
+replayData	JsonNode{...}
+replayTag	string
+}
+JsonNode{
+}
+ClanCapitalRankingList[...]
+ClanCapitalRanking{
+clanCapitalPoints	integer
+clanPoints	integer
+}
+WarStatusList[...]
+WarStatus{
+enemyClanTag	string
+warState	string
+Enum:
+Array [ 10 ]
+statusCode	integer
+clanTag	string
+timestamp	string
+}
+LocationList[...]
+ClanMemberList[...]
+ClanMember{
+league	League{...}
+builderBaseLeague	BuilderBaseLeague{...}
+tag	string
+name	string
+role	string
+Enum:
+Array [ 5 ]
+townHallLevel	integer
+expLevel	integer
+clanRank	integer
+previousClanRank	integer
+donations	integer
+donationsReceived	integer
+trophies	integer
+builderBaseTrophies	integer
+playerHouse	PlayerHouse{...}
+}
+PlayerHouse{
+elements	PlayerHouseElementList[...]
+}
+PlayerHouseElementList[...]
+PlayerHouseElement{
+id	integer
+type	string
+Enum:
+Array [ 4 ]
+}
+BuilderBaseLeague
+League{
+name	JsonLocalizedName{...}
+id	integer
+iconUrls	{...}
+}
+LeagueSeasonList[...]
+LeagueSeason{
+id	string
+}
+BuilderBaseLeagueList[...]
+VerifyTokenRequest{
+token	string
+}
+VerifyTokenResponse{
+tag	string
+token	string
+status	string
+}
+Clan
+ClanCapital
+ClanDistrictDataList[...]
+ClanDistrictData{
+name	JsonLocalizedName{...}
+id	integer
+districtHallLevel	integer
+}
+Language{
+name	string
+id	integer
+languageCode	string
+}
+CapitalLeague{
+name	JsonLocalizedName{...}
+id	integer
+}
+ClanWar{
+clan	WarClan{...}
+opponent	WarClan{...}
+teamSize	integer
+attacksPerMember	integer
+battleModifier	string
+Enum:
+Array [ 2 ]
+startTime	string
+state	string
+Enum:
+Array [ 10 ]
+endTime	string
+preparationStartTime	string
+}
+WarClan{
+destructionPercentage	Float{...}
+tag	string
+name	string
+badgeUrls	{...}
+clanLevel	integer
+attacks	integer
+stars	integer
+expEarned	integer
+members	ClanWarMemberList[...]
+}
+ClanWarMemberList[...]
+ClanWarMember{
+tag	string
+name	string
+mapPosition	integer
+townhallLevel	integer
+opponentAttacks	integer
+bestOpponentAttack	ClanWarAttack{...}
+attacks	ClanWarAttackList[...]
+}
+ClanWarAttackList[...]
+ClanWarAttack{
+order	integer
+attackerTag	string
+defenderTag	string
+stars	integer
+destructionPercentage	integer
+duration	integer
+}
+Float{
+}
+ClanBuilderBaseRankingList[...]
+ClanBuilderBaseRanking{
+clanBuilderBasePoints	integer
+clanPoints	integer
+}
+PlayerBuilderBaseRankingList[...]
+PlayerBuilderBaseRanking{
+builderBaseLeague	BuilderBaseLeague{...}
+clan	PlayerRankingClan{...}
+tag	string
+name	string
+expLevel	integer
+rank	integer
+previousRank	integer
+builderBaseTrophies	integer
+}
+PlayerRankingClan{
+tag	string
+name	string
+badgeUrls	{...}
+}
+ClanList[...]
+PlayerRankingList[...]
+PlayerRanking{
+league	League{...}
+clan	PlayerRankingClan{...}
+attackWins	integer
+defenseWins	integer
+tag	string
+name	string
+expLevel	integer
+rank	integer
+previousRank	integer
+trophies	integer
+}
+LeagueList[...]
+ClanWarLog[...]
+ClanWarLogEntry{
+clan	WarClan{...}
+opponent	WarClan{...}
+teamSize	integer
+attacksPerMember	integer
+battleModifier	string
+Enum:
+Array [ 2 ]
+endTime	string
+result	string
+Enum:
+Array [ 3 ]
+}
+GoldPassSeason{
+startTime	string
+endTime	string
+}
+DeepLinkCreationRequest{
+playerTags	StringList[...]
+clanTag	string
+opponentClanTag	string
+}
+StringList[...]
+String{
+}
+DeepLinkCreationResponse{
+link	string
+}
+ClanWarLeagueGroup{
+tag	string
+state	string
+Enum:
+Array [ 5 ]
+season	string
+clans	ClanWarLeagueClanList[...]
+rounds	ClanWarLeagueRoundList[...]
+}
+ClanWarLeagueRoundList[...]
+ClanWarLeagueRound{
+warTags	StringList[...]
+}
+ClanWarLeagueClanList[...]
+ClanWarLeagueClan{
+tag	string
+clanLevel	integer
+name	string
+members	ClanWarLeagueClanMemberList[...]
+badgeUrls	{...}
+}
+ClanWarLeagueClanMemberList[...]
+ClanWarLeagueClanMember{
+tag	string
+townHallLevel	integer
+name	string
+}
+ClanRankingList[...]
+ClanRanking{
+clanLevel	integer
+clanPoints	integer
+location	Location{...}
+members	integer
+tag	string
+name	string
+rank	integer
+previousRank	integer
+badgeUrls	{...}
+}
+CapitalLeagueList[...]
+Player{
+league	League{...}
+builderBaseLeague	BuilderBaseLeague{...}
+clan	PlayerClan{...}
+role	string
+Enum:
+Array [ 5 ]
+warPreference	string
+Enum:
+Array [ 2 ]
+attackWins	integer
+defenseWins	integer
+townHallLevel	integer
+townHallWeaponLevel	integer
+legendStatistics	PlayerLegendStatistics{...}
+troops	PlayerItemLevelList[...]
+heroes	PlayerItemLevelList[...]
+heroEquipment	PlayerItemLevelList[...]
+spells	PlayerItemLevelList[...]
+labels	LabelList[...]
+tag	string
+name	string
+expLevel	integer
+trophies	integer
+bestTrophies	integer
+donations	integer
+donationsReceived	integer
+builderHallLevel	integer
+builderBaseTrophies	integer
+bestBuilderBaseTrophies	integer
+warStars	integer
+achievements	PlayerAchievementProgressList[...]
+clanCapitalContributions	integer
+playerHouse	PlayerHouse{...}
+}
+PlayerAchievementProgressList[...]
+PlayerAchievementProgress{
+stars	integer
+value	integer
+name	JsonLocalizedName{...}
+target	integer
+info	JsonLocalizedName{...}
+completionInfo	JsonLocalizedName{...}
+village	string
+Enum:
+Array [ 3 ]
+}
+PlayerItemLevelList[...]
+PlayerItemLevel{
+level	integer
+name	JsonLocalizedName{...}
+maxLevel	integer
+village	string
+Enum:
+Array [ 3 ]
+superTroopIsActive	boolean
+equipment	PlayerItemLevelList[...]
+}
+PlayerLegendStatistics{
+previousSeason	LegendLeagueTournamentSeasonResult{...}
+previousBuilderBaseSeason	LegendLeagueTournamentSeasonResult{...}
+bestBuilderBaseSeason	LegendLeagueTournamentSeasonResult{...}
+legendTrophies	integer
+currentSeason	LegendLeagueTournamentSeasonResult{...}
+bestSeason	LegendLeagueTournamentSeasonResult{...}
+}
+LegendLeagueTournamentSeasonResult{
+trophies	integer
+id	string
+rank	integer
+}
+PlayerClan{
+tag	string
+clanLevel	integer
+name	string
+badgeUrls	{...}
+}
+ClientError{
+reason	string
+message	string
+type	string
+detail	{...}
+}
