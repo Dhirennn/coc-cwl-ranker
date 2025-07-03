@@ -6,9 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Shield, Trophy, Star, Crown, Swords, Calculator, Users, AlertCircle, Loader2, Key, Eye, EyeOff, ExternalLink, Info } from "lucide-react"
+import { Shield, Trophy, Star, Crown, Swords, Calculator, Users, AlertCircle, Loader2, Key, Eye, EyeOff, ExternalLink, Info, TrendingUp, Target, Award, Zap, Activity, BarChart3, PieChart } from "lucide-react"
 import Link from "next/link"
 import AdBanner from "@/components/AdBanner"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, LineChart, Line, Pie } from 'recharts'
 
 interface CWLMember {
   tag: string
@@ -28,6 +29,46 @@ interface Attack {
   attackerTH: number
 }
 
+interface Analytics {
+  bestAttacker: {
+    member: CWLMember
+    avgScore: number
+  }
+  mostConsistent: {
+    member: CWLMember
+    variance: number
+  }
+  bravest: {
+    member: CWLMember
+    braveAttacks: number
+    braveRatio: number
+  }
+  mostReliable: {
+    member: CWLMember
+    missedRate: number
+  }
+  starMaster: {
+    member: CWLMember
+    avgStars: number
+  }
+  destructionExpert: {
+    member: CWLMember
+    avgDestruction: number
+  }
+  participationChampion: {
+    member: CWLMember
+    warsParticipated: number
+  }
+  generalStats: {
+    totalMembers: number
+    membersWithAttacks: number
+    totalAttacks: number
+    totalMissedAttacks: number
+    avgStarsPerAttack: number
+    participationRate: number
+  }
+}
+
 export default function RankerPage() {
   const [clanTag, setClanTag] = useState("")
   const [apiKey, setApiKey] = useState("")
@@ -37,6 +78,7 @@ export default function RankerPage() {
   const [testResult, setTestResult] = useState("")
   const [members, setMembers] = useState<CWLMember[]>([])
   const [leagueInfo, setLeagueInfo] = useState<any>(null)
+  const [analytics, setAnalytics] = useState<Analytics | null>(null)
 
   const calculateThMultiplier = (attackerTH: number, defenderTH: number) => {
     const diff = defenderTH - attackerTH
@@ -122,11 +164,13 @@ export default function RankerPage() {
         // TEST mode handled by backend - show demo data
         setMembers(data.members || [])
         setLeagueInfo(data.leagueInfo)
+        setAnalytics(data.analytics || null)
         return
       }
 
       setMembers(data.members || [])
       setLeagueInfo(data.leagueInfo)
+      setAnalytics(data.analytics || null)
       
     } catch (err: any) {
       setError(err.message || "Failed to fetch clan data. Please check the clan tag and API key.")
@@ -502,6 +546,415 @@ export default function RankerPage() {
                     </Table>
                   </CardContent>
                 </Card>
+
+            {/* Analytics Section */}
+            {analytics && (
+              <Card className="mt-8 bg-gradient-to-br from-green-800 to-green-900 border-2 border-green-400/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-green-300">
+                    <BarChart3 className="h-6 w-6" />
+                    Clan Performance Analytics
+                  </CardTitle>
+                  <CardDescription className="text-green-200">
+                    Detailed insights about your clan's CWL performance and standout warriors
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {/* General Stats Overview */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div className="bg-slate-800/50 rounded-lg p-4 text-center border border-yellow-500/20">
+                      <div className="text-3xl font-bold text-yellow-300 mb-1">{analytics.generalStats.totalAttacks}</div>
+                      <div className="text-sm text-slate-400">Total Attacks</div>
+                    </div>
+                    <div className="bg-slate-800/50 rounded-lg p-4 text-center border border-blue-500/20">
+                      <div className="text-3xl font-bold text-blue-300 mb-1">{analytics.generalStats.avgStarsPerAttack}</div>
+                      <div className="text-sm text-slate-400">Avg Stars/Attack</div>
+                    </div>
+                    <div className="bg-slate-800/50 rounded-lg p-4 text-center border border-green-500/20">
+                      <div className="text-3xl font-bold text-green-300 mb-1">{analytics.generalStats.participationRate}%</div>
+                      <div className="text-sm text-slate-400">Participation Rate</div>
+                    </div>
+                    <div className="bg-slate-800/50 rounded-lg p-4 text-center border border-red-500/20">
+                      <div className="text-3xl font-bold text-red-300 mb-1">{analytics.generalStats.totalMissedAttacks}</div>
+                      <div className="text-sm text-slate-400">Missed Attacks</div>
+                    </div>
+                  </div>
+
+                  {/* Charts Section */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    {/* Top Performers Chart */}
+                    <Card className="bg-slate-800/30 border border-slate-600/30">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-white">
+                          <BarChart3 className="h-5 w-5 text-blue-400" />
+                          Top Performers by Score
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={(() => {
+                            // Get top 8 performers by score for the chart
+                            return members
+                              .filter(member => member.attacks.length > 0)
+                              .sort((a, b) => b.score - a.score)
+                              .slice(0, 8)
+                              .map(member => ({
+                                name: member.name.length > 12 ? member.name.substring(0, 12) + '...' : member.name,
+                                fullName: member.name,
+                                score: Number(member.score),
+                                rank: member.rank,
+                                attacks: member.attacks.length,
+                                th: member.townHallLevel
+                              }));
+                          })()}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                            <XAxis 
+                              dataKey="name" 
+                              angle={-45}
+                              textAnchor="end"
+                              height={80}
+                              tick={{ fill: '#9ca3af', fontSize: 11 }}
+                            />
+                            <YAxis tick={{ fill: '#9ca3af' }} />
+                            <Tooltip 
+                              contentStyle={{ 
+                                backgroundColor: '#1f2937', 
+                                border: '1px solid #374151',
+                                borderRadius: '8px',
+                                color: '#f3f4f6'
+                              }}
+                              formatter={(value: any, name: any, props: any) => [
+                                `${Number(value).toFixed(1)} points`,
+                                `${props.payload.fullName} (Rank #${props.payload.rank})`
+                              ]}
+                              labelFormatter={(label: any, payload: any) => {
+                                if (payload && payload[0]) {
+                                  return `${payload[0].payload.fullName} - TH${payload[0].payload.th} (${payload[0].payload.attacks} attacks)`;
+                                }
+                                return label;
+                              }}
+                            />
+                            <Bar dataKey="score" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+
+                    {/* Participation Breakdown */}
+                    <Card className="bg-slate-800/30 border border-slate-600/30">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-white">
+                          <PieChart className="h-5 w-5 text-green-400" />
+                          Participation Breakdown
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <RechartsPieChart>
+                            <Pie
+                              data={[
+                                { 
+                                  name: 'Active Attackers', 
+                                  value: analytics.generalStats.membersWithAttacks,
+                                  color: '#10b981'
+                                },
+                                { 
+                                  name: 'Non-Attackers', 
+                                  value: analytics.generalStats.totalMembers - analytics.generalStats.membersWithAttacks,
+                                  color: '#ef4444'
+                                }
+                              ]}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={false}
+                              label={({ name, percent }: { name: string; percent: number }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                              outerRadius={80}
+                              fill="#8884d8"
+                              dataKey="value"
+                            >
+                              <Cell fill="#10b981" />
+                              <Cell fill="#ef4444" />
+                            </Pie>
+                            <Tooltip 
+                              contentStyle={{ 
+                                backgroundColor: '#1f2937', 
+                                border: '1px solid #374151',
+                                borderRadius: '8px',
+                                color: '#f3f4f6'
+                              }}
+                            />
+                          </RechartsPieChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+
+                    {/* Attack Success Distribution */}
+                    <Card className="bg-slate-800/30 border border-slate-600/30">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-white">
+                                  <Star className="h-5 w-5 text-yellow-400" />
+                          Attack Success Distribution
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={(() => {
+                            // Calculate star distribution
+                            const starCounts: Record<string, number> = { '0 Stars': 0, '1 Star': 0, '2 Stars': 0, '3 Stars': 0 };
+                            members.forEach(member => {
+                              member.attacks.forEach(attack => {
+                                const key = `${attack.stars} Star${attack.stars !== 1 ? 's' : ''}`;
+                                starCounts[key] = (starCounts[key] || 0) + 1;
+                              });
+                            });
+                            return Object.entries(starCounts).map(([stars, count]) => ({
+                              stars,
+                              count,
+                              percentage: analytics.generalStats.totalAttacks > 0 ? 
+                                ((count / analytics.generalStats.totalAttacks) * 100).toFixed(1) : '0'
+                            }));
+                          })()}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                            <XAxis dataKey="stars" tick={{ fill: '#9ca3af' }} />
+                            <YAxis tick={{ fill: '#9ca3af' }} />
+                            <Tooltip 
+                              contentStyle={{ 
+                                backgroundColor: '#1f2937', 
+                                border: '1px solid #374151',
+                                borderRadius: '8px',
+                                color: '#f3f4f6'
+                              }}
+                              formatter={(value: any, name: any, props: any) => [
+                                `${value} attacks (${props.payload.percentage}%)`, 
+                                'Count'
+                              ]}
+                            />
+                            <Bar dataKey="count" fill="#fbbf24" radius={[4, 4, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+
+                    {/* Individual Player Attack Performance */}
+                    <Card className="bg-slate-800/30 border border-slate-600/30">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-white">
+                          <Target className="h-5 w-5 text-red-400" />
+                          Top Attackers - Average Stars
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={(() => {
+                            // Get top 8 players by average stars
+                            return members
+                              .filter(member => member.attacks.length > 0)
+                              .map(member => ({
+                                name: member.name.length > 12 ? member.name.substring(0, 12) + '...' : member.name,
+                                fullName: member.name,
+                                avgStars: member.attacks.reduce((sum, attack) => sum + attack.stars, 0) / member.attacks.length,
+                                totalAttacks: member.attacks.length,
+                                th: member.townHallLevel
+                              }))
+                              .sort((a, b) => b.avgStars - a.avgStars)
+                              .slice(0, 8);
+                          })()}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                            <XAxis 
+                              dataKey="name" 
+                              angle={-45}
+                              textAnchor="end"
+                              height={80}
+                              tick={{ fill: '#9ca3af', fontSize: 11 }}
+                            />
+                            <YAxis 
+                              tick={{ fill: '#9ca3af' }}
+                              domain={[0, 3]}
+                              ticks={[0, 1, 2, 3]}
+                            />
+                            <Tooltip 
+                              contentStyle={{ 
+                                backgroundColor: '#1f2937', 
+                                border: '1px solid #374151',
+                                borderRadius: '8px',
+                                color: '#f3f4f6'
+                              }}
+                              formatter={(value: any, name: any, props: any) => [
+                                `${Number(value).toFixed(2)} average stars`,
+                                `${props.payload.fullName}`
+                              ]}
+                              labelFormatter={(label: any, payload: any) => {
+                                if (payload && payload[0]) {
+                                  return `${payload[0].payload.fullName} - TH${payload[0].payload.th} (${payload[0].payload.totalAttacks} attacks)`;
+                                }
+                                return label;
+                              }}
+                            />
+                            <Bar dataKey="avgStars" fill="#fbbf24" radius={[4, 4, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+                                </div>
+
+                  {/* Individual Awards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    {/* Best Attacker */}
+                    <Card className="bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 border border-yellow-400/40 hover:border-yellow-400/60 transition-colors">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-yellow-300 text-lg">
+                          <Trophy className="h-5 w-5" />
+                          Best Attacker
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-center">
+                          <div className="font-bold text-white text-lg">{analytics.bestAttacker.member.name}</div>
+                          <div className="text-sm text-white mb-2">{analytics.bestAttacker.member.tag}</div>
+                          <div className="text-3xl font-bold text-yellow-300 mb-1">{analytics.bestAttacker.avgScore.toFixed(1)}</div>
+                          <div className="text-sm font-medium text-white">Average Attack Score</div>
+                          <div className="text-xs text-yellow-200 mt-2">
+                            {analytics.bestAttacker.member.attacks.length} attacks • TH{analytics.bestAttacker.member.townHallLevel}
+                                </div>
+                              </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Most Consistent */}
+                    <Card className="bg-gradient-to-br from-blue-400/20 to-blue-600/20 border border-blue-400/40 hover:border-blue-400/60 transition-colors">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-blue-300 text-lg">
+                          <Activity className="h-5 w-5" />
+                          Most Consistent
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-center">
+                          <div className="font-bold text-white text-lg">{analytics.mostConsistent.member.name}</div>
+                          <div className="text-sm text-white mb-2">{analytics.mostConsistent.member.tag}</div>
+                          <div className="text-3xl font-bold text-blue-300 mb-1">{analytics.mostConsistent.variance.toFixed(0)}</div>
+                          <div className="text-sm font-medium text-white">Score Variance (Lower = Better)</div>
+                          <div className="text-xs text-blue-200 mt-2">
+                            {analytics.mostConsistent.member.attacks.length} attacks • TH{analytics.mostConsistent.member.townHallLevel}
+                            </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Bravest Attacker */}
+                    <Card className="bg-gradient-to-br from-orange-400/20 to-red-500/20 border border-orange-400/40 hover:border-orange-400/60 transition-colors">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-orange-300 text-lg">
+                          <Zap className="h-5 w-5" />
+                          Bravest Warrior
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-center">
+                          <div className="font-bold text-white text-lg">{analytics.bravest.member.name}</div>
+                          <div className="text-sm text-white mb-2">{analytics.bravest.member.tag}</div>
+                          <div className="text-3xl font-bold text-orange-300 mb-1">{(analytics.bravest.braveRatio * 100).toFixed(0)}%</div>
+                          <div className="text-sm font-medium text-white">{analytics.bravest.braveAttacks} Attacks vs Higher TH</div>
+                          <div className="text-xs text-orange-200 mt-2">
+                            {analytics.bravest.member.attacks.length} total attacks • TH{analytics.bravest.member.townHallLevel}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+                    {/* Most Reliable */}
+                    <Card className="bg-gradient-to-br from-emerald-400/20 to-green-600/20 border border-emerald-400/40 hover:border-emerald-400/60 transition-colors">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-emerald-300 text-lg">
+                          <Shield className="h-5 w-5" />
+                          Most Reliable
+                        </CardTitle>
+              </CardHeader>
+                      <CardContent>
+                        <div className="text-center">
+                          <div className="font-bold text-white text-lg">{analytics.mostReliable.member.name}</div>
+                          <div className="text-sm text-white mb-2">{analytics.mostReliable.member.tag}</div>
+                          <div className="text-3xl font-bold text-emerald-300 mb-1">{((1 - analytics.mostReliable.missedRate) * 100).toFixed(0)}%</div>
+                          <div className="text-sm font-medium text-white">Attack Completion Rate</div>
+                          <div className="text-xs text-emerald-200 mt-2">
+                            {analytics.mostReliable.member.attacks.length} attacks • {analytics.mostReliable.member.missedAttacks} missed
+                </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Star Master */}
+                    <Card className="bg-gradient-to-br from-indigo-400/20 to-purple-600/20 border border-indigo-400/40 hover:border-indigo-400/60 transition-colors">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-indigo-300 text-lg">
+                          <Star className="h-5 w-5" />
+                          Star Master
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-center">
+                          <div className="font-bold text-white text-lg">{analytics.starMaster.member.name}</div>
+                          <div className="text-sm text-white mb-2">{analytics.starMaster.member.tag}</div>
+                          <div className="text-3xl font-bold text-indigo-300 mb-1">{analytics.starMaster.avgStars.toFixed(1)}</div>
+                          <div className="text-sm font-medium text-white">Average Stars per Attack</div>
+                          <div className="text-xs text-indigo-200 mt-2">
+                            {analytics.starMaster.member.attacks.reduce((sum, attack) => sum + attack.stars, 0)} total stars
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Destruction Expert */}
+                    <Card className="bg-gradient-to-br from-rose-400/20 to-pink-600/20 border border-rose-400/40 hover:border-rose-400/60 transition-colors">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-rose-300 text-lg">
+                          <Target className="h-5 w-5" />
+                          Destruction Expert
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-center">
+                          <div className="font-bold text-white text-lg">{analytics.destructionExpert.member.name}</div>
+                          <div className="text-sm text-white mb-2">{analytics.destructionExpert.member.tag}</div>
+                          <div className="text-3xl font-bold text-rose-300 mb-1">{analytics.destructionExpert.avgDestruction.toFixed(0)}%</div>
+                          <div className="text-sm font-medium text-white">Average Destruction</div>
+                          <div className="text-xs text-rose-200 mt-2">
+                            {analytics.destructionExpert.member.attacks.length} attacks • TH{analytics.destructionExpert.member.townHallLevel}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Participation Champion */}
+                  <Card className="bg-gradient-to-br from-slate-700/40 to-slate-800/40 border border-yellow-400/40 hover:border-yellow-400/60 transition-colors">
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="bg-yellow-400/20 p-4 rounded-lg border border-yellow-400/30">
+                            <Users className="h-10 w-10 text-yellow-300" />
+                          </div>
+                          <div>
+                            <h3 className="text-2xl font-bold text-yellow-300">Participation Champion</h3>
+                            <p className="text-yellow-200 text-lg">{analytics.participationChampion.member.name} - Most Dedicated Warrior</p>
+                            <div className="text-sm text-slate-400 mt-1">
+                              {analytics.participationChampion.member.tag} • TH{analytics.participationChampion.member.townHallLevel}
+                      </div>
+                    </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-4xl font-bold text-yellow-300 mb-1">{analytics.participationChampion.warsParticipated}</div>
+                          <div className="text-sm text-slate-400">Wars Participated</div>
+                          <div className="text-xs text-yellow-200 mt-1">
+                            {analytics.participationChampion.member.attacks.length} total attacks
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Bottom Banner Ad - After results */}
             <div className="mt-8 mb-6">

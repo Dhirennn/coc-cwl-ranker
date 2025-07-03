@@ -135,6 +135,139 @@ function calculateMemberScore(member: CWLMember): number {
   return finalScore
 }
 
+// Calculate analytics for members with attacks
+function calculateAnalytics(members: CWLMember[]) {
+  const membersWithAttacks = members.filter(member => member.attacks.length > 0)
+  
+  if (membersWithAttacks.length === 0) {
+    return null
+  }
+
+  // Helper function to calculate attack scores
+  const getAttackScores = (member: CWLMember) => 
+    member.attacks.map(attack => calculateAttackScore(attack))
+
+  // Best Overall Attacker (highest average attack score)
+  const bestAttacker = membersWithAttacks.reduce((best, current) => {
+    const currentAvg = getAttackScores(current).reduce((a, b) => a + b, 0) / current.attacks.length
+    const bestAvg = getAttackScores(best).reduce((a, b) => a + b, 0) / best.attacks.length
+    return currentAvg > bestAvg ? current : best
+  })
+
+  // Most Consistent Attacker (lowest variance in attack scores)
+  const mostConsistent = membersWithAttacks.reduce((best, current) => {
+    if (current.attacks.length < 2) return best
+    
+    const currentScores = getAttackScores(current)
+    const currentAvg = currentScores.reduce((a, b) => a + b, 0) / currentScores.length
+    const currentVariance = currentScores.reduce((sum, score) => sum + Math.pow(score - currentAvg, 2), 0) / currentScores.length
+    
+    const bestScores = getAttackScores(best)
+    const bestAvg = bestScores.reduce((a, b) => a + b, 0) / bestScores.length
+    const bestVariance = bestScores.reduce((sum, score) => sum + Math.pow(score - bestAvg, 2), 0) / bestScores.length
+    
+    return currentVariance < bestVariance ? current : best
+  })
+
+  // Bravest Attacker (most attacks against higher TH levels)
+  const bravest = membersWithAttacks.reduce((best, current) => {
+    const currentBraveAttacks = current.attacks.filter(attack => attack.defenderTH > attack.attackerTH).length
+    const bestBraveAttacks = best.attacks.filter(attack => attack.defenderTH > attack.attackerTH).length
+    const currentBraveRatio = current.attacks.length > 0 ? currentBraveAttacks / current.attacks.length : 0
+    const bestBraveRatio = best.attacks.length > 0 ? bestBraveAttacks / best.attacks.length : 0
+    return currentBraveRatio > bestBraveRatio ? current : best
+  })
+
+  // Most Reliable (lowest missed attack rate)
+  const mostReliable = members.reduce((best, current) => {
+    const currentTotal = current.attacks.length + current.missedAttacks
+    const bestTotal = best.attacks.length + best.missedAttacks
+    if (currentTotal === 0) return best
+    if (bestTotal === 0) return current
+    
+    const currentMissRate = current.missedAttacks / currentTotal
+    const bestMissRate = best.missedAttacks / bestTotal
+    return currentMissRate < bestMissRate ? current : best
+  })
+
+  // Star Master (highest average stars per attack)
+  const starMaster = membersWithAttacks.reduce((best, current) => {
+    const currentAvgStars = current.attacks.reduce((sum, attack) => sum + attack.stars, 0) / current.attacks.length
+    const bestAvgStars = best.attacks.reduce((sum, attack) => sum + attack.stars, 0) / best.attacks.length
+    return currentAvgStars > bestAvgStars ? current : best
+  })
+
+  // Destruction Expert (highest average destruction percentage)
+  const destructionExpert = membersWithAttacks.reduce((best, current) => {
+    const currentAvgDestruction = current.attacks.reduce((sum, attack) => sum + attack.destructionPercentage, 0) / current.attacks.length
+    const bestAvgDestruction = best.attacks.reduce((sum, attack) => sum + attack.destructionPercentage, 0) / best.attacks.length
+    return currentAvgDestruction > bestAvgDestruction ? current : best
+  })
+
+  // War Participation Champion
+  const participationChampion = members.reduce((best, current) => 
+    current.warsParticipated > best.warsParticipated ? current : best
+  )
+
+  // Calculate some general stats
+  const totalAttacks = membersWithAttacks.reduce((sum, member) => sum + member.attacks.length, 0)
+  const totalMissedAttacks = members.reduce((sum, member) => sum + member.missedAttacks, 0)
+  const avgStarsPerAttack = totalAttacks > 0 ? 
+    membersWithAttacks.reduce((sum, member) => 
+      sum + member.attacks.reduce((attackSum, attack) => attackSum + attack.stars, 0), 0
+    ) / totalAttacks : 0
+
+  return {
+    bestAttacker: {
+      member: bestAttacker,
+      avgScore: getAttackScores(bestAttacker).reduce((a, b) => a + b, 0) / bestAttacker.attacks.length
+    },
+    mostConsistent: {
+      member: mostConsistent,
+      variance: (() => {
+        if (mostConsistent.attacks.length < 2) return 0
+        const scores = getAttackScores(mostConsistent)
+        const avg = scores.reduce((a, b) => a + b, 0) / scores.length
+        return scores.reduce((sum, score) => sum + Math.pow(score - avg, 2), 0) / scores.length
+      })()
+    },
+    bravest: {
+      member: bravest,
+      braveAttacks: bravest.attacks.filter(attack => attack.defenderTH > attack.attackerTH).length,
+      braveRatio: bravest.attacks.length > 0 ? 
+        bravest.attacks.filter(attack => attack.defenderTH > attack.attackerTH).length / bravest.attacks.length : 0
+    },
+    mostReliable: {
+      member: mostReliable,
+      missedRate: (() => {
+        const total = mostReliable.attacks.length + mostReliable.missedAttacks
+        return total > 0 ? mostReliable.missedAttacks / total : 0
+      })()
+    },
+    starMaster: {
+      member: starMaster,
+      avgStars: starMaster.attacks.reduce((sum, attack) => sum + attack.stars, 0) / starMaster.attacks.length
+    },
+    destructionExpert: {
+      member: destructionExpert,
+      avgDestruction: destructionExpert.attacks.reduce((sum, attack) => sum + attack.destructionPercentage, 0) / destructionExpert.attacks.length
+    },
+    participationChampion: {
+      member: participationChampion,
+      warsParticipated: participationChampion.warsParticipated
+    },
+    generalStats: {
+      totalMembers: members.length,
+      membersWithAttacks: membersWithAttacks.length,
+      totalAttacks,
+      totalMissedAttacks,
+      avgStarsPerAttack: Math.round(avgStarsPerAttack * 100) / 100,
+      participationRate: members.length > 0 ? 
+        Math.round((membersWithAttacks.length / members.length) * 100) : 0
+    }
+  }
+}
+
 // Helper function to normalize clan tags for comparison
 function normalizeClanTag(tag: string): string {
   return tag.replace('#', '').toUpperCase()
@@ -305,7 +438,8 @@ export async function POST(request: NextRequest) {
           league: 'Test League'
         },
         members: rankedMembers,
-        totalWars: 7
+        totalWars: 7,
+        analytics: calculateAnalytics(rankedMembers)
       })
     }
 
@@ -463,7 +597,8 @@ export async function POST(request: NextRequest) {
         state: leagueGroup.state
       },
       members,
-      totalWars: wars.length
+      totalWars: wars.length,
+      analytics: calculateAnalytics(members)
     })
 
   } catch (error) {
