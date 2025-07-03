@@ -33,7 +33,6 @@ export default function RankerPage() {
   const [showApiKey, setShowApiKey] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [testResult, setTestResult] = useState("")
   const [members, setMembers] = useState<CWLMember[]>([])
   const [leagueInfo, setLeagueInfo] = useState<any>(null)
 
@@ -90,7 +89,6 @@ export default function RankerPage() {
 
     setLoading(true)
     setError("")
-    setTestResult("")
     
     try {
       const response = await fetch('/api/cwl', {
@@ -111,16 +109,10 @@ export default function RankerPage() {
       }
 
       // Handle special test responses
-      if (clanTag.trim().toUpperCase() === 'IP-TEST') {
-        const status = data.isUsingFixieIP ? '✅ SUCCESS' : '❌ ISSUE'
-        const statusColor = data.isUsingFixieIP ? 'text-green-400' : 'text-orange-400'
-        
-        setTestResult(`🌐 IP Address & Proxy Check:\n• Status: ${status}\n• Your outbound IP: ${data.outboundIP}\n• Expected Fixie IPs: ${data.expectedIPs}\n• Fixie configured: ${data.fixieEnabled ? 'Yes' : 'No'}\n• HTTP proxy set: ${data.httpProxy}\n• CoC API test: ${data.cocApiTest}\n\n📋 ${data.instructions}`)
-        return
-      }
-
-      if (clanTag.trim().toUpperCase() === 'FIXIE-TEST') {
-        setTestResult(`🔧 Fixie Configuration:\n• Status: ${data.message}\n• Configured: ${data.fixieConfigured ? 'Yes' : 'No'}\n\n📋 ${data.instructions}`)
+      if (clanTag.trim().toUpperCase() === 'TEST') {
+        // TEST mode handled by backend - show demo data
+        setMembers(data.members || [])
+        setLeagueInfo(data.leagueInfo)
         return
       }
 
@@ -178,10 +170,10 @@ export default function RankerPage() {
               <div className="bg-gradient-to-br from-yellow-500 to-orange-500 p-2 rounded-lg">
                 <Calculator className="h-6 w-6 text-white" />
                   </div>
-              Enter the War Room
+              CWL Bonus Calculator
                 </CardTitle>
                 <CardDescription className="text-blue-200">
-              Enter your clan tag and API key to calculate fair CWL bonus rankings
+              Get fair rankings for your CWL bonus distribution based on performance, not just donations or favorites
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -190,79 +182,73 @@ export default function RankerPage() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-blue-300 text-lg">
                   <Info className="h-5 w-5" />
-                  Get Your API Key (Required)
+                  Step 1: Get Your API Key (Takes 2 minutes)
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="text-sm text-blue-200 space-y-2">
-                  <div className="font-semibold text-blue-100">Follow these steps to get your Clash of Clans API key:</div>
-                  <ol className="list-decimal list-inside space-y-1 ml-4">
-                    <li>
-                      Go to{" "}
-                      <a 
-                        href="https://developer.clashofclans.com/#/account" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-yellow-300 hover:text-yellow-200 underline inline-flex items-center gap-1"
-                      >
-                        developer.clashofclans.com
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </li>
-                    <li>Click on "Create New Key"</li>
-                    <li>Add any Key Name and Description</li>
-                    <li>
-                      <strong>For IP Address:</strong>
-                      <ul className="ml-4 mt-1 space-y-1 text-xs">
-                        <li>• <strong>Vercel (Recommended):</strong> Use{" "}
-                          <a 
-                            href="https://vercel.com/integrations/fixie" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-yellow-300 hover:text-yellow-200 underline inline-flex items-center gap-1"
-                          >
-                            Fixie integration
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
-                          {" "}for static IPs
-                        </li>
-                        <li>• <strong>Alternative 1:</strong> <code className="bg-slate-700 px-1 rounded text-yellow-300">0.0.0.0</code> (may not work)</li>
-                        <li>• <strong>Alternative 2:</strong> <code className="bg-slate-700 px-1 rounded text-yellow-300">0.0.0.0-255.255.255.255</code> (may not work)</li>
-                        <li>• <strong>Local testing:</strong> Get your IP from{" "}
-                          <a 
-                            href="https://whatismyipaddress.com/" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-yellow-300 hover:text-yellow-200 underline inline-flex items-center gap-1"
-                          >
-                            whatismyipaddress.com
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
-                        </li>
-                      </ul>
-                    </li>
-                    <li>Copy-paste your API key below</li>
-                  </ol>
-                  <div className="bg-green-900/30 border border-green-500/30 rounded-lg p-3 mt-3">
-                    <div className="flex items-center gap-2 text-green-300 text-sm">
-                      <Shield className="h-4 w-4" />
-                      <span className="font-semibold">Privacy Notice:</span>
+              <CardContent className="space-y-4">
+                <div className="text-blue-200 space-y-3">
+                  <div className="font-semibold text-blue-100 text-base">Quick Setup - Follow these 4 simple steps:</div>
+                  
+                  <div className="bg-slate-800/50 rounded-lg p-4 space-y-3">
+                    <div className="flex items-start gap-3">
+                      <span className="bg-yellow-500 text-slate-900 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">1</span>
+                      <div>
+                        <div className="font-medium text-white">Visit the Clash of Clans Developer Site</div>
+                        <a 
+                          href="https://developer.clashofclans.com/#/account" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-yellow-300 hover:text-yellow-200 underline inline-flex items-center gap-1 text-sm"
+                        >
+                          Click here to open developer.clashofclans.com
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </div>
                     </div>
-                    <p className="text-green-200 text-xs mt-1">
-                      We do not store your API key. It is only used for this session and transmitted securely over HTTPS.
-                    </p>
+                    
+                    <div className="flex items-start gap-3">
+                      <span className="bg-yellow-500 text-slate-900 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">2</span>
+                      <div>
+                        <div className="font-medium text-white">Create Your Key</div>
+                        <div className="text-sm text-blue-200">Click "Create New Key" and fill in:</div>
+                        <ul className="text-sm text-blue-200 mt-1 ml-4 space-y-1">
+                          <li>• <strong>Name:</strong> Any name you want (e.g., "CWL Ranker")</li>
+                          <li>• <strong>Description:</strong> Any description (e.g., "For ranking tool")</li>
+                        </ul>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start gap-3">
+                      <span className="bg-yellow-500 text-slate-900 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">3</span>
+                      <div>
+                        <div className="font-medium text-white">Set IP Addresses</div>
+                        <div className="text-sm text-blue-200">Copy and paste these IPs exactly:</div>
+                        <div className="bg-slate-700 rounded px-3 py-2 mt-1 font-mono text-yellow-300 text-sm">
+                          52.5.155.132,52.87.82.133
+                        </div>
+                        <div className="text-xs text-slate-400 mt-1">
+                          These are the website's server addresses
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start gap-3">
+                      <span className="bg-yellow-500 text-slate-900 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">4</span>
+                      <div>
+                        <div className="font-medium text-white">Copy Your Key</div>
+                        <div className="text-sm text-blue-200">After creating, copy the long API key and paste it below</div>
+                      </div>
+                    </div>
                   </div>
                   
-                  <div className="bg-orange-900/30 border border-orange-500/30 rounded-lg p-3 mt-3">
-                    <div className="flex items-center gap-2 text-orange-300 text-sm">
-                      <AlertCircle className="h-4 w-4" />
-                      <span className="font-semibold">Vercel Deployment:</span>
+                  <div className="bg-green-900/30 border border-green-500/30 rounded-lg p-3">
+                    <div className="flex items-center gap-2 text-green-300 text-sm">
+                      <Shield className="h-4 w-4" />
+                      <span className="font-semibold">Your API key is safe:</span>
                     </div>
-                    <div className="text-orange-200 text-xs mt-1 space-y-1">
-                      <p><strong>1. Add Fixie integration</strong> to your Vercel project (recommended)</p>
-                      <p><strong>2. Get static IPs</strong> from Fixie dashboard and use in CoC API key</p>
-                      <p><strong>3. Test with "FIXIE-TEST"</strong> clan tag to verify setup</p>
-                    </div>
+                    <p className="text-green-200 text-xs mt-1">
+                      We don't save your key anywhere. It's only used to get your clan data and sent securely.
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -273,12 +259,12 @@ export default function RankerPage() {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-yellow-300 flex items-center gap-2">
                   <Key className="h-4 w-4" />
-                  Your API Key (Private & Secure)
+                  Step 2: Enter Your API Key
                 </label>
                 <div className="relative">
                   <Input
                     type={showApiKey ? "text" : "password"}
-                    placeholder="Paste your Clash of Clans API key here..."
+                    placeholder="Paste your API key here (starts with eyJ0...)"
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                     className="flex-1 bg-slate-900/50 border-blue-500/30 text-white placeholder:text-slate-400 pr-12"
@@ -302,20 +288,16 @@ export default function RankerPage() {
               {/* Clan Tag Input */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-yellow-300">
-                      Clan Tag
+                  Step 3: Enter Your Clan Tag
                 </label>
-                    <Input
-                placeholder="Enter clan tag (e.g., #2ABC123)"
-                      value={clanTag}
-                      onChange={(e) => setClanTag(e.target.value)}
-                className="flex-1 bg-slate-900/50 border-blue-500/30 text-white placeholder:text-slate-400"
-                    />
-                <div className="text-xs text-slate-400">
-                  <span className="text-yellow-300">💡 Want to try first?</span> Enter "TEST" as clan tag to see demo data (no API key needed)
-                  <br />
-                  <span className="text-blue-300">🔧 Check setup:</span> Enter "FIXIE-TEST" to verify Fixie proxy configuration
-                  <br />
-                  <span className="text-red-300">🌐 Check IP:</span> Enter "IP-TEST" to see what IP address your requests use
+                <Input
+                  placeholder="Enter your clan tag (e.g., #2ABC123)"
+                  value={clanTag}
+                  onChange={(e) => setClanTag(e.target.value)}
+                  className="flex-1 bg-slate-900/50 border-blue-500/30 text-white placeholder:text-slate-400"
+                />
+                <div className="text-xs text-blue-300">
+                  💡 <strong>Want to try it first?</strong> Enter "TEST" to see how it works with demo data (no API key needed)
                 </div>
               </div>
 
@@ -323,17 +305,17 @@ export default function RankerPage() {
                 <Button
                 onClick={handleAnalyzeClan}
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-slate-900 font-bold py-3"
+                className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-slate-900 font-bold py-3 text-lg"
                 >
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Analyzing...
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Getting your clan data...
                   </>
                 ) : (
                   <>
-                    <Trophy className="mr-2 h-4 w-4" />
-                    Calculate Rankings
+                    <Trophy className="mr-2 h-5 w-5" />
+                    Step 4: Calculate Fair Rankings
                   </>
                 )}
                 </Button>
@@ -343,13 +325,6 @@ export default function RankerPage() {
               <div className="flex items-center gap-2 text-red-400 bg-red-900/20 p-3 rounded-lg border border-red-500/30">
                 <AlertCircle className="h-4 w-4" />
                 {error}
-              </div>
-            )}
-
-            {testResult && (
-              <div className="flex items-start gap-2 text-blue-400 bg-blue-900/20 p-3 rounded-lg border border-blue-500/30">
-                <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <pre className="text-sm whitespace-pre-wrap">{testResult}</pre>
               </div>
             )}
               </CardContent>
