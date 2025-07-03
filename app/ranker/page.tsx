@@ -337,7 +337,7 @@ export default function RankerPage() {
                 onClick={handleAnalyzeClan}
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-slate-900 font-bold py-3 text-lg"
-                >
+                  >
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
