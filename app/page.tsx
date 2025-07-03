@@ -68,14 +68,16 @@ export default function HomePage() {
                 Rank Your Clan
               </Button>
             </Link>
-            <Button
-              size="lg"
-              variant="outline"
-              className="text-lg px-8 py-4 bg-slate-800/50 border-2 border-blue-400 text-blue-200 hover:bg-slate-700/50 hover:text-yellow-300 backdrop-blur-sm"
-            >
-              <Calculator className="mr-2 h-6 w-6" />
-              Study the Formula
-            </Button>
+            <Link href="#war-formula">
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-lg px-8 py-4 bg-slate-800/50 border-2 border-blue-400 text-blue-200 hover:bg-slate-700/50 hover:text-yellow-300 backdrop-blur-sm"
+              >
+                <Calculator className="mr-2 h-6 w-6" />
+                Study the Formula
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
