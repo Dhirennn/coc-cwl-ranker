@@ -23,6 +23,7 @@ interface Attack {
   destructionPercentage: number
   defenderTH: number
   attackerTH: number
+  warDay: number  // Add war day to track which day the attack was made
 }
 
 async function fetchWithAuth(url: string, apiKey: string) {
@@ -356,8 +357,8 @@ export async function POST(request: NextRequest) {
           name: 'Elite Warrior',
           townHallLevel: 16,
           attacks: [
-            { stars: 3, destructionPercentage: 100, defenderTH: 17, attackerTH: 16 }, // +1 TH brave attack
-            { stars: 2, destructionPercentage: 85, defenderTH: 16, attackerTH: 16 },   // Same TH
+            { stars: 3, destructionPercentage: 100, defenderTH: 17, attackerTH: 16, warDay: 1 }, // +1 TH brave attack
+            { stars: 2, destructionPercentage: 85, defenderTH: 16, attackerTH: 16, warDay: 2 },   // Same TH
           ],
           missedAttacks: 0,
           warsParticipated: 7,
@@ -369,8 +370,8 @@ export async function POST(request: NextRequest) {
           name: 'Strategic Master',
           townHallLevel: 15,
           attacks: [
-            { stars: 2, destructionPercentage: 95, defenderTH: 17, attackerTH: 15 }, // +2 TH hero attack!
-            { stars: 3, destructionPercentage: 100, defenderTH: 16, attackerTH: 15 }, // +1 TH brave
+            { stars: 2, destructionPercentage: 95, defenderTH: 17, attackerTH: 15, warDay: 1 }, // +2 TH hero attack!
+            { stars: 3, destructionPercentage: 100, defenderTH: 16, attackerTH: 15, warDay: 2 }, // +1 TH brave
           ],
           missedAttacks: 0,
           warsParticipated: 6,
@@ -382,8 +383,8 @@ export async function POST(request: NextRequest) {
           name: 'Casual Attacker', 
           townHallLevel: 14,
           attacks: [
-            { stars: 2, destructionPercentage: 70, defenderTH: 13, attackerTH: 14 }, // -1 TH weak
-            { stars: 1, destructionPercentage: 60, defenderTH: 12, attackerTH: 14 }, // -2 TH coward
+            { stars: 2, destructionPercentage: 70, defenderTH: 13, attackerTH: 14, warDay: 1 }, // -1 TH weak
+            { stars: 1, destructionPercentage: 60, defenderTH: 12, attackerTH: 14, warDay: 2 }, // -2 TH coward
           ],
           missedAttacks: 1, // Missed one attack!
           warsParticipated: 5,
@@ -395,8 +396,8 @@ export async function POST(request: NextRequest) {
           name: 'Perfect Player',
           townHallLevel: 15,
           attacks: [
-            { stars: 3, destructionPercentage: 100, defenderTH: 17, attackerTH: 15 }, // +2 TH hero!
-            { stars: 3, destructionPercentage: 100, defenderTH: 16, attackerTH: 15 }, // +1 TH brave
+            { stars: 3, destructionPercentage: 100, defenderTH: 17, attackerTH: 15, warDay: 1 }, // +2 TH hero!
+            { stars: 3, destructionPercentage: 100, defenderTH: 16, attackerTH: 15, warDay: 2 }, // +1 TH brave
           ],
           missedAttacks: 0,
           warsParticipated: 7,
@@ -408,7 +409,7 @@ export async function POST(request: NextRequest) {
           name: 'Unreliable Member',
           townHallLevel: 16,
           attacks: [
-            { stars: 1, destructionPercentage: 50, defenderTH: 16, attackerTH: 16 }, // Poor attack
+            { stars: 1, destructionPercentage: 50, defenderTH: 16, attackerTH: 16, warDay: 1 }, // Poor attack
           ],
           missedAttacks: 3, // Missed lots of attacks
           warsParticipated: 4,
@@ -501,6 +502,7 @@ export async function POST(request: NextRequest) {
 
     // Process each war
     console.log(`\n🏰 Processing ${wars.length} wars for clan ${clanTag}`)
+    let actualWarDay = 0 // Track actual war days for our clan
     wars.forEach((war: any, warIndex: number) => {
       if (!war || !war.clan || !war.opponent) {
         console.log(`⚠️ War ${warIndex + 1}: Invalid war data, skipping`)
@@ -516,11 +518,14 @@ export async function POST(request: NextRequest) {
         return
       }
 
+      // Increment actual war day only when our clan is participating
+      actualWarDay++
+
       // Determine which clan is ours
       const ourClan = clanInWar ? war.clan : war.opponent
       const enemyClan = clanInWar ? war.opponent : war.clan
 
-      console.log(`\n⚔️ War ${warIndex + 1}: ${ourClan.name} vs ${enemyClan.name}`)
+      console.log(`\n⚔️ War ${actualWarDay} (Round ${warIndex + 1}): ${ourClan.name} vs ${enemyClan.name}`)
       console.log(`   State: ${war.state}`)
       console.log(`   Attacks per member: ${war.attacksPerMember || 2}`)
       console.log(`   Our clan members in war: ${ourClan.members?.length || 0}`)
@@ -557,13 +562,14 @@ export async function POST(request: NextRequest) {
                 stars: attack.stars,
                 destructionPercentage: attack.destructionPercentage,
                 defenderTH: defender.townhallLevel,
-                attackerTH: member.townhallLevel
+                attackerTH: member.townhallLevel,
+                warDay: actualWarDay // Use actual war day instead of warIndex
               }
               memberData.attacks.push(attackData)
               
-              console.log(`      Attack ${attackIndex + 1}: ${attack.stars}⭐ ${attack.destructionPercentage}% vs TH${defender.townhallLevel}`)
+              console.log(`      Attack ${attackIndex + 1} (Day ${actualWarDay}): ${attack.stars}⭐ ${attack.destructionPercentage}% vs TH${defender.townhallLevel}`)
             } else {
-              console.log(`      ⚠️ Attack ${attackIndex + 1}: Could not find defender ${attack.defenderTag}`)
+              console.log(`      ⚠️ Attack ${attackIndex + 1} (Day ${actualWarDay}): Could not find defender ${attack.defenderTag}`)
             }
           })
         } else {

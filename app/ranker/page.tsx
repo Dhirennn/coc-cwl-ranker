@@ -27,6 +27,7 @@ interface Attack {
   destructionPercentage: number
   defenderTH: number
   attackerTH: number
+  warDay: number
 }
 
 interface Analytics {
@@ -530,6 +531,7 @@ export default function RankerPage() {
                           <div className="space-y-1">
                             {member.attacks.map((attack, i) => (
                               <div key={i} className="flex items-center gap-2 text-xs">
+                                <div className="text-slate-400">Day {attack.warDay}:</div>
                                 <div className="flex items-center gap-1">
                                   <Star className="h-3 w-3 text-yellow-400" />
                                   <span>{attack.stars}</span>
