@@ -46,7 +46,7 @@ async function fetchWithAuth(url: string, apiKey: string) {
     console.error(`   - Response: ${response.status} ${response.statusText}`)
     
     if (response.status === 403) {
-      throw new Error(`Invalid API key or IP address not allowed. Make sure your Clash of Clans API key allows Render's static IP addresses. Check your Render dashboard for the current static IPs.`)
+      throw new Error(`Invalid API key or IP address not allowed. Make sure your Clash of Clans API key allows these Render static IP addresses: 54.254.162.138, 13.228.225.19, 18.142.128.26`)
     }
     if (response.status === 404) {
       throw new Error('Clan not found. Please check the clan tag.')

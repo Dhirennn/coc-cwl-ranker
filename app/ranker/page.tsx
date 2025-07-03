@@ -173,7 +173,9 @@ export default function RankerPage() {
               CWL Bonus Calculator
                 </CardTitle>
                 <CardDescription className="text-blue-200">
-              Get fair rankings for your CWL bonus distribution based on performance, not just donations or favorites
+              Get fair rankings for your CWL bonus distribution based on performance, not just donations or favorites. 
+              <br />
+              <span className="text-yellow-300 font-medium">Important:</span> You'll need to add specific IP addresses to your API key (shown below).
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -222,16 +224,14 @@ export default function RankerPage() {
                       <span className="bg-yellow-500 text-slate-900 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">3</span>
                       <div>
                         <div className="font-medium text-white">Set IP Addresses</div>
-                        <div className="text-sm text-blue-200">Copy and paste the IP addresses from your Render dashboard:</div>
-                        <div className="bg-slate-700 rounded px-3 py-2 mt-1 text-yellow-300 text-sm">
-                          <div className="font-mono">
-                            Find your static IPs in:
-                            <br />
-                            Render Dashboard → Your Service → Settings → Static IPs
-                          </div>
+                        <div className="text-sm text-blue-200">Copy and paste these IP addresses exactly into the "Allowed IP addresses" field:</div>
+                        <div className="bg-slate-700 rounded px-3 py-2 mt-1 font-mono text-yellow-300 text-sm">
+                          54.254.162.138,
+                          13.228.225.19,
+                          18.142.128.26
                         </div>
                         <div className="text-xs text-slate-400 mt-1">
-                          Render provides static IP addresses that don't change
+                          These are Render's static IP addresses for this service
                         </div>
                       </div>
                     </div>
