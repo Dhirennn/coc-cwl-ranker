@@ -22,151 +22,97 @@ Your CWL Ranker targets a specific gaming audience (Clash of Clans players), whi
 After approval, you'll get a Publisher ID like: `ca-pub-1234567890123456`
 
 ### Step 3: Configure Environment Variables
-Add this to your Render environment variables:
 
+**On your hosting platform (Render):**
+1. Go to Environment Variables
+2. Add: `NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-4074522008297476` (use your actual ID)
+3. Redeploy your service
+
+**For local development, create `.env.local`:**
 ```bash
-NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-1234567890123456
+NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-4074522008297476
 ```
 
-**On Render Dashboard:**
-1. Go to your service → Environment
-2. Add new environment variable
-3. Key: `NEXT_PUBLIC_ADSENSE_CLIENT_ID`
-4. Value: `ca-pub-your-actual-publisher-id`
+### Step 4: Update API Key Instructions
 
-### Step 4: Create Ad Units
-In your AdSense dashboard, create these ad units:
+Since you're now using **RoyaleAPI proxy** (much simpler than Render static IPs):
 
-#### Top Banner (728x90)
-- **Name**: "CWL Ranker Top Banner"
-- **Type**: Display ads
-- **Size**: 728x90 (Leaderboard)
-- **Copy the Ad Slot ID**: Replace `"1234567890"` in the code
+**For your users:**
+1. Visit [Clash of Clans Developer Portal](https://developer.clashofclans.com)
+2. Create API key with **single IP**: `45.79.218.79`
+3. Use your tool normally
 
-#### Middle Rectangle (300x250)
-- **Name**: "CWL Ranker Middle Rectangle"  
-- **Type**: Display ads
-- **Size**: 300x250 (Medium Rectangle)
-- **Copy the Ad Slot ID**: Replace `"0987654321"` in the code
+**Benefits of RoyaleAPI proxy:**
+- ✅ Single IP to whitelist (45.79.218.79)
+- ✅ No dependency on hosting provider's IP management
+- ✅ More reliable than static IP services
+- ✅ Simpler setup for users
 
-#### Bottom Banner (728x90)
-- **Name**: "CWL Ranker Bottom Banner"
-- **Type**: Display ads
-- **Size**: 728x90 (Leaderboard)
-- **Copy the Ad Slot ID**: Replace `"1357924680"` in the code
+## 🎯 Ad Placement Strategy
 
-### Step 5: Update Ad Slot IDs
-Edit `app/ranker/page.tsx` and replace the placeholder ad slots:
+Your CWL Ranker has **strategic ad placements**:
 
-```typescript
-// Top Banner - Replace this:
-adSlot="1234567890" 
-// With your actual ad slot ID:
-adSlot="your-top-banner-slot-id"
+### **1. Top Banner Ad**
+- **Location**: Above input form
+- **Size**: 728x90 leaderboard
+- **Audience**: Fresh visitors setting up their ranking
 
-// Middle Rectangle - Replace this:
-adSlot="0987654321"
-// With your actual ad slot ID:
-adSlot="your-middle-rectangle-slot-id"
+### **2. Middle Rectangle Ad**  
+- **Location**: Between input and results
+- **Size**: 300x250 rectangle
+- **Audience**: Users who are engaged and waiting for results
 
-// Bottom Banner - Replace this:
-adSlot="1357924680"
-// With your actual ad slot ID:  
-adSlot="your-bottom-banner-slot-id"
-```
+### **3. Bottom Banner Ad**
+- **Location**: After results table
+- **Size**: 728x90 leaderboard  
+- **Audience**: Users who got value and might bookmark/return
 
-## 📊 Ad Placement Strategy
+## 💡 Revenue Optimization Tips
 
-### Current Ad Placements:
-1. **Top Banner** (728x90): Above the input form - high visibility
-2. **Middle Rectangle** (300x250): Between input and results - catches attention
-3. **Bottom Banner** (728x90): After results table - users who complete the ranking
+### **Content Strategy**
+- Add blog posts about CWL strategies
+- Create guides on optimal attacking
+- Add TH progression guides
+- More pages = more ad impressions
 
-### Best Practices:
-- **Above the fold**: Top banner gets highest CTR
-- **Content separation**: Middle ad separates form from results naturally
-- **Completion reward**: Bottom ad targets engaged users who got results
+### **User Engagement**
+- Add "Save Results" feature (return visits)
+- Email notifications for CWL seasons
+- Discord integration for clans
+- Bookmark-worthy content
 
-## 💡 Alternative Ad Networks
+### **Technical Optimizations**
+- Enable analytics to track user behavior
+- A/B test ad positions
+- Optimize Core Web Vitals for better ad performance
+- Add lazy loading for ads below fold
 
-### If AdSense rejects you:
-1. **Media.net** - Yahoo/Bing powered ads
-2. **PropellerAds** - Pop-unders and push notifications
-3. **AdThrive** - Premium network (requires 100k monthly pageviews)
-4. **Mediavine** - Another premium option (50k monthly sessions)
+## 📊 Expected Revenue
 
-### Gaming-Specific Networks:
-1. **Unity Ads** - Mobile gaming focused
-2. **IronSource** - Gaming and mobile apps
-3. **AdMob** - If you create a mobile app version
+**Conservative estimates for CWL Ranker:**
+- **Gaming niche**: $3-6 RPM
+- **100 daily users**: ~300 page views
+- **Monthly revenue**: $30-100 (varies by traffic quality)
 
-## 🔧 Testing Your Setup
+**Growth strategies:**
+- SEO for "CWL ranking", "Clash of Clans tools"
+- Share in Clash of Clans Discord servers
+- Reddit communities (/r/ClashOfClans)
+- YouTube tool reviews
 
-### Development Testing:
-- Ads show as gray placeholder boxes locally
-- Text reads "AdSense ads will appear here in production"
+## 🔧 Technical Implementation
 
-### Production Testing:
-1. Deploy to Render with your AdSense ID
-2. Wait 1-2 hours for ads to appear
-3. Check browser console for any errors
-4. Use browser dev tools to verify ad script loads
+Your ads are **already configured** with:
+- ✅ AdSense script in layout
+- ✅ Responsive ad components
+- ✅ Development/production handling
+- ✅ Privacy policy compliance
+- ✅ ads.txt file
 
-### Troubleshooting:
-- **No ads showing**: Check environment variable spelling
-- **Console errors**: Verify Publisher ID format
-- **Ad policy issues**: Ensure content complies with AdSense policies
+## 📋 Next Steps
 
-## 📈 Revenue Optimization Tips
-
-### Content Strategy:
-1. **Add more pages**: Create guides, tier lists, strategy content
-2. **SEO optimization**: Target "clash of clans cwl" keywords
-3. **Regular updates**: Keep content fresh for return visitors
-
-### Traffic Growth:
-1. **Reddit**: Share in r/ClashOfClans (follow rules)
-2. **Discord**: Join CoC Discord servers and share tool
-3. **YouTube**: Create tutorial videos showing the tool
-4. **Social media**: Twitter, TikTok gaming content
-
-### Ad Optimization:
-1. **Monitor performance**: Check which ads perform best
-2. **A/B test**: Try different ad sizes and placements
-3. **Responsive ads**: Consider auto-sized responsive units
-4. **Page load speed**: Ensure ads don't slow down the site
-
-## 💵 Revenue Expectations
-
-### Conservative Estimates:
-- **100 daily users**: $1-5/day
-- **500 daily users**: $5-25/day  
-- **1,000 daily users**: $10-50/day
-- **5,000 daily users**: $50-250/day
-
-### Factors Affecting Revenue:
-- **Geography**: US/UK traffic pays more
-- **Device**: Mobile vs desktop
-- **Engagement**: Time spent on site
-- **Seasonality**: CWL seasons = traffic spikes
-
-## 🛡️ Important Notes
-
-### AdSense Policies:
-- No clicking your own ads
-- No asking users to click ads
-- No misleading content
-- Keep content family-friendly
-- Respect user privacy (GDPR compliance)
-
-### Performance:
-- Monitor site speed with ads
-- Use lazy loading for below-fold ads
-- Consider ad blockers (20-30% of users)
-
-### Legal:
-- Add Privacy Policy (required for ads)
-- Cookie consent for EU users
-- Terms of Service recommended
-
-Ready to start earning from your awesome CWL tool! 🚀💰 
+1. **Deploy current changes**
+2. **Update your API key** to use RoyaleAPI proxy IP: `45.79.218.79`
+3. **Apply for AdSense** (takes 1-14 days)
+4. **Add your Publisher ID** to environment variables
+5. **Start earning** from your Clash of Clans tool! 

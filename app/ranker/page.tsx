@@ -113,9 +113,7 @@ export default function RankerPage() {
 
       // Handle IP-TEST response
       if (clanTag.trim().toUpperCase() === 'IP-TEST') {
-        const status = data.isUsingExpectedIP ? '✅ SUCCESS' : '⚠️ INFO'
-        
-        setTestResult(`🌐 IP Address Check for Render Static IPs:\n• Status: ${status}\n• Your outbound IP: ${data.outboundIP}\n• Expected Render IPs: ${data.expectedIPs}\n• Platform: ${data.platform}\n• CoC API test: ${data.cocApiTest}\n\n📋 ${data.instructions}`)
+        setTestResult(`🌐 IP Configuration Check:\n• Status: ${data.status}\n• Proxy IP: ${data.proxyIP}\n• API Test: ${data.cocApiTest}\n\n📋 ${data.instructions}`)
         return
       }
 
@@ -201,7 +199,7 @@ export default function RankerPage() {
                 <CardDescription className="text-blue-200">
               Get fair rankings for your CWL bonus distribution based on performance, not just donations or favorites. 
               <br />
-              <span className="text-yellow-300 font-medium">Important:</span> You'll need to add specific IP addresses to your API key (shown below).
+              <span className="text-yellow-300 font-medium">Important:</span> You'll need to add our proxy IP to your API key (shown below).
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -249,15 +247,13 @@ export default function RankerPage() {
                     <div className="flex items-start gap-3">
                       <span className="bg-yellow-500 text-slate-900 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">3</span>
                       <div>
-                        <div className="font-medium text-white">Set IP Addresses</div>
-                        <div className="text-sm text-blue-200">Copy and paste these IP addresses exactly into the "Allowed IP addresses" field:</div>
+                        <div className="font-medium text-white">Add Proxy IP</div>
+                        <div className="text-sm text-blue-200">Copy and paste this IP address into the "Allowed IP addresses" field:</div>
                         <div className="bg-slate-700 rounded px-3 py-2 mt-1 font-mono text-yellow-300 text-sm">
-                          54.254.162.138,
-                          13.228.225.19,
-                          18.142.128.26
+                          45.79.218.79
                         </div>
                         <div className="text-xs text-slate-400 mt-1">
-                          These are Render's static IP addresses for this service
+                          This is the only IP address you need to add
                         </div>
                       </div>
                     </div>

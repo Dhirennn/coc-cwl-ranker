@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { initializePing } from '@/lib/ping-utils'
 
-// COC API base URL
-const COC_API_BASE = 'https://api.clashofclans.com/v1'
+// COC API base URL - Using RoyaleAPI proxy for better reliability
+const COC_API_BASE = 'https://cocproxy.royaleapi.dev/v1'
 
 // Track if ping has been initialized to avoid duplicate intervals
 let isPingInitialized = false
@@ -28,7 +28,7 @@ interface Attack {
 async function fetchWithAuth(url: string, apiKey: string) {
   console.log(`🌐 Making API request to: ${url}`)
   console.log(`🔑 Using API key: ${apiKey.substring(0, 20)}...`)
-  console.log(`🚀 Using Render's static IP`)
+  console.log(`🚀 Using RoyaleAPI proxy (45.79.218.79)`)
   
   const fetchOptions: RequestInit = {
     headers: {
@@ -50,7 +50,7 @@ async function fetchWithAuth(url: string, apiKey: string) {
     console.error(`   - Response: ${response.status} ${response.statusText}`)
     
     if (response.status === 403) {
-      throw new Error(`Invalid API key or IP address not allowed. Make sure your Clash of Clans API key allows these Render static IP addresses: 54.254.162.138, 13.228.225.19, 18.142.128.26`)
+      throw new Error(`Invalid API key or IP not allowed. Please make sure you've added 45.79.218.79 to your API key's allowed IPs.`)
     }
     if (response.status === 404) {
       throw new Error('Clan not found. Please check the clan tag.')
@@ -177,37 +177,32 @@ export async function POST(request: NextRequest) {
         }
 
         // Test 2: Test a simple request to CoC API to see if it's accessible
-        console.log(`🧪 Testing CoC API accessibility...`)
+        console.log(`🧪 Testing RoyaleAPI proxy accessibility...`)
         let apiTest = 'Not tested'
         try {
-          const testResponse = await fetch('https://api.clashofclans.com/v1/leagues', {
+          const testResponse = await fetch('https://cocproxy.royaleapi.dev/v1/leagues', {
             headers: {
               'Accept': 'application/json'
             }
           })
           apiTest = testResponse.ok ? `✅ Accessible (${testResponse.status})` : `❌ Failed (${testResponse.status})`
-          console.log(`🧪 CoC API test: ${apiTest}`)
+          console.log(`🧪 RoyaleAPI proxy test: ${apiTest}`)
         } catch (error) {
           apiTest = `❌ Error: ${error}`
-          console.log(`🧪 CoC API test error: ${error}`)
+          console.log(`🧪 RoyaleAPI proxy test error: ${error}`)
         }
 
-        // Check if we're getting the expected Render IPs
-        const expectedIPs = ['54.254.162.138', '13.228.225.19', '18.142.128.26']
-        const isExpectedIP = expectedIPs.includes(ipResult.split(',')[0].trim())
+        // With RoyaleAPI proxy, we don't need to worry about our server's IP
+        const proxyIP = '45.79.218.79'
         
         return NextResponse.json({
           success: true,
-          message: 'IP Address Check for Render Static IPs',
-          outboundIP: ipResult,
-          isUsingExpectedIP: isExpectedIP,
-          expectedIPs: '54.254.162.138, 13.228.225.19, 18.142.128.26',
+          message: 'IP Configuration Check',
+          proxyIP: proxyIP,
           cocApiTest: apiTest,
-          status: isExpectedIP ? '✅ SUCCESS: Using expected Render IP!' : '⚠️ INFO: Using different IP than expected',
-          instructions: isExpectedIP 
-            ? `✅ Perfect! Your requests are using expected Render IP: ${ipResult}. Your CoC API key should allow: 54.254.162.138, 13.228.225.19, 18.142.128.26`
-            : `ℹ️ Your requests are coming from IP: ${ipResult}. Make sure your CoC API key allows this IP address, or use the expected Render IPs: 54.254.162.138, 13.228.225.19, 18.142.128.26`,
-          platform: 'Render Web Service'
+          status: `✅ Using RoyaleAPI proxy`,
+          instructions: `✅ Your requests will go through our proxy (${proxyIP}). Make sure this IP is allowed in your API key settings.`,
+          platform: 'RoyaleAPI Proxy'
         })
         
       } catch (error) {
