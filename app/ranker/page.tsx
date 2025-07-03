@@ -196,19 +196,22 @@ export default function RankerPage() {
                     <li>Click on "Create New Key"</li>
                     <li>Add any Key Name and Description</li>
                     <li>
-                      Go to{" "}
-                      <a 
-                        href="https://whatismyipaddress.com/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-yellow-300 hover:text-yellow-200 underline inline-flex items-center gap-1"
-                      >
-                        whatismyipaddress.com
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                      {" "}and copy your IPv4
+                      <strong>For IP Address:</strong>
+                      <ul className="ml-4 mt-1 space-y-1 text-xs">
+                        <li>• <strong>Local development:</strong> Get your IP from{" "}
+                          <a 
+                            href="https://whatismyipaddress.com/" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-yellow-300 hover:text-yellow-200 underline inline-flex items-center gap-1"
+                          >
+                            whatismyipaddress.com
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </li>
+                        <li>• <strong>Deployed apps:</strong> Use <code className="bg-slate-700 px-1 rounded text-yellow-300">0.0.0.0/0</code> (allows all IPs)</li>
+                      </ul>
                     </li>
-                    <li>Paste the IPv4 into the "Allowed IP Addresses" field when creating the key</li>
                     <li>Copy-paste your API key below</li>
                   </ol>
                   <div className="bg-green-900/30 border border-green-500/30 rounded-lg p-3 mt-3">
@@ -218,6 +221,16 @@ export default function RankerPage() {
                     </div>
                     <p className="text-green-200 text-xs mt-1">
                       We do not store your API key. It is only used for this session and transmitted securely over HTTPS.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-orange-900/30 border border-orange-500/30 rounded-lg p-3 mt-3">
+                    <div className="flex items-center gap-2 text-orange-300 text-sm">
+                      <AlertCircle className="h-4 w-4" />
+                      <span className="font-semibold">Deployment Tip:</span>
+                    </div>
+                    <p className="text-orange-200 text-xs mt-1">
+                      If you get "IP address not allowed" errors, set your API key's allowed IP to <code className="bg-orange-800/50 px-1 rounded">0.0.0.0/0</code> (allows all IPs) when creating the key.
                     </p>
                   </div>
                 </div>

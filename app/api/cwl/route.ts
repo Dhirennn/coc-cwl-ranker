@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 
 // COC API base URL
 const COC_API_BASE = 'https://api.clashofclans.com/v1'
+// Alternative: Use proxy gateway to bypass IP restrictions - lazy to do this lol
+// const COC_API_BASE = 'https://apis-gateway.herokuapp.com/cocapi'
 
 interface CWLMember {
   tag: string
