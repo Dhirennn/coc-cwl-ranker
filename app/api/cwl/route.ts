@@ -262,8 +262,7 @@ function calculateAnalytics(members: CWLMember[]) {
       totalAttacks,
       totalMissedAttacks,
       avgStarsPerAttack: Math.round(avgStarsPerAttack * 100) / 100,
-      participationRate: members.length > 0 ? 
-        Math.round((membersWithAttacks.length / members.length) * 100) : 0
+      participationRate: Math.round((membersWithAttacks.length / members.filter(m => m.warsParticipated > 0).length) * 100)
     }
   }
 }

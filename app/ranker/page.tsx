@@ -649,7 +649,7 @@ export default function RankerPage() {
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <ResponsiveContainer width="100%" height={300}>
+                        <ResponsiveContainer width="100%" height={400}>
                           <RechartsPieChart>
                             <Pie
                               data={[
@@ -659,22 +659,68 @@ export default function RankerPage() {
                                   color: '#10b981'
                                 },
                                 { 
-                                  name: 'Non-Attackers', 
-                                  value: analytics.generalStats.totalMembers - analytics.generalStats.membersWithAttacks,
+                                  name: 'Missing Attacks', 
+                                  value: members.filter(m => m.warsParticipated > 0 && m.attacks.length === 0).length,
                                   color: '#ef4444'
                                 }
                               ]}
                               cx="50%"
-                              cy="50%"
-                              labelLine={false}
-                              label={({ name, percent }: { name: string; percent: number }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                              outerRadius={80}
+                              cy="45%"
+                              labelLine={{ stroke: '#6b7280', strokeWidth: 1 }}
+                              label={({ name, value, percent, x, y, midAngle }) => {
+                                const RADIAN = Math.PI / 180;
+                                const radius = 70;
+                                const midRadius = radius * 0.5;
+                                
+                                // Calculate position for rotated text
+                                const sin = Math.sin(-RADIAN * midAngle);
+                                const cos = Math.cos(-RADIAN * midAngle);
+                                const textX = x + (cos * midRadius);
+                                const textY = y + (sin * midRadius);
+                                
+                                // Determine text anchor based on position
+                                const textAnchor = cos >= 0 ? 'start' : 'end';
+                                
+                                // Adjust rotation to be more parallel to the pie edges
+                                let rotation = midAngle;
+                                // Right side of the pie
+                                if (cos >= 0) {
+                                  rotation = midAngle - 30;
+                                }
+                                // Left side of the pie
+                                else {
+                                  rotation = midAngle + 150;
+                                }
+                                
+                                return (
+                                  <text 
+                                    x={textX} 
+                                    y={textY} 
+                                    fill="white"
+                                    textAnchor={textAnchor}
+                                    dominantBaseline="middle"
+                                    fontSize={11}
+                                    transform={`rotate(${rotation}, ${textX}, ${textY})`}
+                                  >
+                                    {`${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
+                                  </text>
+                                );
+                              }}
+                              outerRadius={70}
                               fill="#8884d8"
                               dataKey="value"
                             >
                               <Cell fill="#10b981" />
                               <Cell fill="#ef4444" />
                             </Pie>
+                            <Legend
+                              verticalAlign="bottom"
+                              align="center"
+                              layout="horizontal"
+                              wrapperStyle={{
+                                paddingTop: '20px'
+                              }}
+                            />
                             <Tooltip 
                               contentStyle={{ 
                                 backgroundColor: '#1f2937', 
@@ -682,6 +728,7 @@ export default function RankerPage() {
                                 borderRadius: '8px',
                                 color: '#f3f4f6'
                               }}
+                              formatter={(value: any, name: any) => [`${value} members`, name]}
                             />
                           </RechartsPieChart>
                         </ResponsiveContainer>
