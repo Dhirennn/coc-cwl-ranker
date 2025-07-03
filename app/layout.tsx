@@ -2,7 +2,6 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import Script from "next/script"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -26,11 +25,10 @@ export default function RootLayout({
         {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
           <>
             <meta name="google-adsense-account" content={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID} />
-            <Script
-              async
+            <script 
+              async 
               src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
               crossOrigin="anonymous"
-              strategy="afterInteractive"
             />
           </>
         )}
