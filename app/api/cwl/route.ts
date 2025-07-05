@@ -548,10 +548,16 @@ export async function POST(request: NextRequest) {
           // Calculate expected attacks (CWL gives 1 attack per member per war)
           const expectedAttacks = 1
           const actualAttacks = member.attacks?.length || 0
-          const missedInThisWar = Math.max(0, expectedAttacks - actualAttacks)
-          memberData.missedAttacks += missedInThisWar
           
-          console.log(`      Expected attacks: ${expectedAttacks}, Made: ${actualAttacks}, Missed: ${missedInThisWar}`)
+          // Only count missed attacks for wars that have ended
+          // For wars still in progress, members might still attack
+          if (war.state === 'warEnded') {
+            const missedInThisWar = Math.max(0, expectedAttacks - actualAttacks)
+            memberData.missedAttacks += missedInThisWar
+            console.log(`      Expected attacks: ${expectedAttacks}, Made: ${actualAttacks}, Missed: ${missedInThisWar} (War ended)`)
+          } else {
+            console.log(`      Expected attacks: ${expectedAttacks}, Made: ${actualAttacks}, Missed: N/A (War in progress)`)
+          }
           
           // Process attacks
           member.attacks?.forEach((attack: any, attackIndex: number) => {
